@@ -31,7 +31,7 @@ function styleLesson(slug: string): Lesson {
       return [
         part(slug, "intro"),
         part(slug, "stats"),
-        ...pickOne("glass", "abv", "ibu"),
+        ...pickOne("glass", "pickglass", "abv", "ibu"),
         part(slug, "sensory"),
         ...pickOne("aroma"),
         part(slug, "malts"),
@@ -41,7 +41,7 @@ function styleLesson(slug: string): Lesson {
         part(slug, "traits"),
         ...pickOne("family", "bitter", "color"),
         part(slug, "history"),
-        ...pickOne("story:0"),
+        ...pickOne("story:0", "origin"),
         part(slug, "fact"),
         ...pickOne("story:1"),
         ...pickOne("summary", "color", "bitter"),

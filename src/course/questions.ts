@@ -1,5 +1,6 @@
 import { BEER_STYLES, FAMILIES } from "@/lib/beer-guide/styles";
 import { METRICS, formatRange, midpoint } from "@/lib/beer-guide/metrics";
+import { ORIGINS } from "@/lib/beer-guide/origins";
 import type { BeerStyle, Range } from "@/lib/beer-guide/types";
 import type { Answer, Option, Question } from "@/course/types";
 
@@ -41,6 +42,19 @@ export function choiceFirstRight(id: string, prompt: string, options: string[], 
   return choice({ id, prompt, explain, visual }, right, wrong);
 }
 
+/** Hand-written picture choice: `options[0]` is the right one. */
+export function picturesFirstRight(id: string, prompt: string, options: Option[], explain: string): Question {
+  const [right, ...wrong] = options;
+  return choice({ id, prompt, explain }, right, wrong);
+}
+
+/** Hand-written matching: each pair is [left, right]; both columns get shuffled. */
+export function match(id: string, prompt: string, pairs: [string, string][], explain: string): Question {
+  const left = shuffle(pairs);
+  const right = shuffle(pairs.map(([, r]) => r));
+  return { kind: "match", id, prompt, left: left.map(([l]) => l), right, answer: left.map(([, r]) => right.indexOf(r)), explain };
+}
+
 export function checkAnswer(q: Question, a: Answer | undefined): boolean {
   if (a === undefined) return false;
   switch (q.kind) {
@@ -54,7 +68,8 @@ export function checkAnswer(q: Question, a: Answer | undefined): boolean {
       return picked.length === right.length && picked.every((v, i) => v === right[i]);
     }
     case "order":
-      return (a as number[]).every((v, i) => v === q.answer[i]);
+    case "match":
+      return (a as number[]).length === q.answer.length && (a as number[]).every((v, i) => v === q.answer[i]);
   }
 }
 
@@ -107,6 +122,44 @@ export function styleQuestions(s: BeerStyle): Question[] {
       },
       { label: s.name },
       others(s, distinct)
+        .slice(0, 3)
+        .map((o) => ({ label: o.name })),
+    ),
+  );
+
+  // The reverse: name given, pick the glass. Options must look different from
+  // each other too, or two pictures would be the same drawing.
+  const looks: BeerStyle[] = [s];
+  for (const o of others(s)) {
+    if (looks.length === 4) break;
+    if (looks.every((l) => (l.glass ?? "tumbler") !== (o.glass ?? "tumbler") || !overlaps(l.stats.ebc, o.stats.ebc))) looks.push(o);
+  }
+  const glassOption = (o: BeerStyle) => ({ label: o.name, visual: { glass: o.glass ?? "tumbler", ebc: o.stats.ebc } });
+  qs.push(
+    choice(
+      { id: id("pickglass"), prompt: `Коя е ${s.name}?`, explain: `${s.name}: ${formatRange(s.stats.ebc, METRICS.ebc)} EBC.` },
+      glassOption(s),
+      looks.slice(1).map(glassOption),
+    ),
+  );
+
+  // Pins too close together would read as the same spot on a phone-sized map.
+  const origin = ORIGINS[s.slug];
+  const far = (o: BeerStyle) => {
+    const p = ORIGINS[o.slug];
+    return p.region !== origin.region || Math.abs(p.lat - origin.lat) + Math.abs(p.lon - origin.lon) * 0.65 > 1.5;
+  };
+  qs.push(
+    choice(
+      {
+        id: id("origin"),
+        prompt: "Коя бира е родом оттук?",
+        visual: { map: origin },
+        explain: `${s.name} — ${origin.place}.`,
+      },
+      { label: s.name },
+      others(s, far)
+        .filter((o, i, arr) => arr.findIndex((x) => ORIGINS[x.slug].place === ORIGINS[o.slug].place) === i)
         .slice(0, 3)
         .map((o) => ({ label: o.name })),
     ),

@@ -4,16 +4,21 @@ import { Landmark, Microscope, Thermometer } from "lucide-react";
 import BeerGlass from "@/components/beer-guide/BeerGlass";
 import HopBreakdown from "@/components/beer-guide/HopBreakdown";
 import MaltBreakdown from "@/components/beer-guide/MaltBreakdown";
+import OriginMap from "@/components/beer-guide/OriginMap";
+import ProcessDiagram from "@/components/beer-guide/ProcessDiagram";
 import Section from "@/components/beer-guide/Section";
 import SensoryProfile from "@/components/beer-guide/SensoryProfile";
 import StyleFact from "@/components/beer-guide/StyleFact";
 import StyleRadar from "@/components/beer-guide/StyleRadar";
 import type { Card, Visual } from "@/course/types";
 import { METRIC_LIST, formatRange } from "@/lib/beer-guide/metrics";
+import { ORIGINS } from "@/lib/beer-guide/origins";
 import { FAMILIES, getStyleBySlug } from "@/lib/beer-guide/styles";
 
 export function VisualView({ v, className = "h-36" }: { v: Visual; className?: string }) {
   const id = useId().replace(/:/g, "");
+  // Maps are wide; they size by width and ignore the height class.
+  if (v.map) return <OriginMap origin={v.map} className="w-full max-w-sm" />;
   if (v.img) return <img src={v.img} alt="" className={`${className} aspect-square rounded-full object-cover ring-1 ring-black/5`} />;
   if (v.glass) return <BeerGlass id={id} shape={v.glass} ebc={v.ebc ?? [8, 12]} className={className} />;
   return null;
@@ -38,6 +43,7 @@ export function CardView({ card }: { card: Card }) {
       </div>
     );
   }
+  if (card.kind === "process") return <ProcessDiagram step={card.step} />;
   return <StylePartView slug={card.slug} part={card.part} />;
 }
 
@@ -114,6 +120,7 @@ function StylePartView({ slug, part }: { slug: string; part: Extract<Card, { kin
     case "history":
       return (
         <Section icon={Landmark} title="История" accent="#0e7490">
+          <OriginMap origin={ORIGINS[slug]} className="mb-3.5 w-full" />
           <p className="text-[15px] leading-relaxed text-stone-700">{s.history}</p>
         </Section>
       );

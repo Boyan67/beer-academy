@@ -26,8 +26,19 @@ const LEAVE: Record<Exclude<Mode, "review">, string> = {
 
 const defaultAnswer = (q: Question): Answer | undefined => (q.kind === "slider" ? sliderStart(q) : undefined);
 
-const ready = (q: Question, a: Answer | undefined) =>
-  a !== undefined && (q.kind === "order" ? (a as number[]).length === q.items.length : q.kind !== "multi" || (a as number[]).length > 0);
+function ready(q: Question, a: Answer | undefined): boolean {
+  if (a === undefined) return false;
+  switch (q.kind) {
+    case "order":
+      return (a as number[]).length === q.items.length;
+    case "match":
+      return !(a as number[]).includes(-1);
+    case "multi":
+      return (a as number[]).length > 0;
+    default:
+      return true;
+  }
+}
 
 export default function Player({ steps, mode, timeLimit, onExit, onFinish }: Props) {
   const answerQ = useProgress((s) => s.answer);

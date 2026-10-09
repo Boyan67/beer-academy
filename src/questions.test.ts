@@ -3,6 +3,9 @@ import { describe, expect, it } from "vitest";
 import { COURSES, courseLessons, learnThenQuiz } from "@/course/courses";
 import { checkAnswer } from "@/course/questions";
 import type { Question } from "@/course/types";
+import { project } from "@/lib/beer-guide/map";
+import { MAP_DATA } from "@/lib/beer-guide/map-data";
+import { ORIGINS } from "@/lib/beer-guide/origins";
 import { BEER_STYLES } from "@/lib/beer-guide/styles";
 import { addDays, dayKey, levelFor, nextReview, streak } from "@/progress";
 
@@ -31,9 +34,36 @@ describe("content", () => {
         if (q.kind === "choice") expect(q.options[q.answer], q.id).toBeDefined();
         if (q.kind === "multi") expect(q.answer.every((i) => i >= 0), q.id).toBe(true);
         if (q.kind === "order") expect([...q.answer].sort()).toEqual(q.items.map((_, i) => i));
+        if (q.kind === "match") {
+          expect(new Set(q.left).size, q.id).toBe(q.left.length);
+          expect(new Set(q.right).size, q.id).toBe(q.right.length);
+          expect([...q.answer].sort()).toEqual(q.right.map((_, i) => i));
+        }
+        // Picture options hide their names until checked, so no two may look alike.
+        if (q.kind === "choice" && q.options.some((o) => o.visual)) {
+          expect(q.options.every((o) => o.visual), `${q.id} mixes pictures and text`).toBe(true);
+          const looks = q.options.map((o) => o.visual!);
+          for (let a = 0; a < looks.length; a++)
+            for (let b = a + 1; b < looks.length; b++) {
+              const [x, y] = [looks[a], looks[b]];
+              const sameGlass = x.glass && x.glass === y.glass && x.ebc![0] <= y.ebc![1] && y.ebc![0] <= x.ebc![1];
+              expect(sameGlass || (x.img && x.img === y.img), `${q.id}: options ${a} and ${b} look the same`).toBeFalsy();
+            }
+        }
       }
     }
   });
+});
+
+it("every style has an origin on its map", () => {
+  for (const s of BEER_STYLES) {
+    const o = ORIGINS[s.slug];
+    expect(o, s.slug).toBeDefined();
+    const map = MAP_DATA[o.region];
+    expect((map.countries as Record<string, string>)[o.country], `${s.slug} country`).toBeTruthy();
+    const [x, y] = project(o.region, o.lat, o.lon);
+    expect(x > 10 && x < map.width - 10 && y > 10 && y < map.height - 10, `${s.slug} pin off the map`).toBe(true);
+  }
 });
 
 it("lessons teach first, quiz after", () => {
@@ -47,6 +77,7 @@ describe("checkAnswer", () => {
   const choice: Question = { kind: "choice", id: "c", prompt: "", explain: "", options: [{ label: "a" }, { label: "b" }], answer: 1 };
   const multi: Question = { kind: "multi", id: "m", prompt: "", explain: "", options: [{ label: "a" }, { label: "b" }, { label: "c" }], answer: [2, 0] };
   const order: Question = { kind: "order", id: "o", prompt: "", explain: "", items: ["x", "y", "z"], answer: [2, 0, 1], hint: ["", ""] };
+  const match: Question = { kind: "match", id: "x", prompt: "", explain: "", left: ["a", "b", "c"], right: ["q", "r", "s"], answer: [1, 2, 0] };
   const slider: Question = { kind: "slider", id: "s", prompt: "", explain: "", min: 0, max: 100, step: 1, unit: "", answer: [40, 70] };
 
   it("grades every kind", () => {
@@ -61,6 +92,9 @@ describe("checkAnswer", () => {
     expect(checkAnswer(slider, 40)).toBe(true);
     expect(checkAnswer(slider, 70)).toBe(true);
     expect(checkAnswer(slider, 71)).toBe(false);
+    expect(checkAnswer(match, [1, 2, 0])).toBe(true);
+    expect(checkAnswer(match, [1, 0, 2])).toBe(false);
+    expect(checkAnswer(match, [1, 2, -1])).toBe(false);
   });
 });
 

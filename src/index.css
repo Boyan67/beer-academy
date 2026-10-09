@@ -34,3 +34,42 @@ input[type="range"] {
     display: none !important;
   }
 }
+
+/* Map pin: a slow ring, so the eye finds it. */
+@keyframes pin-pulse {
+  from {
+    transform: scale(0.5);
+    opacity: 0.5;
+  }
+  to {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+.pin-pulse {
+  animation: pin-pulse 1.8s ease-out infinite;
+}
+
+/* Boil and fermentation bubbles on the brewing diagram. */
+@keyframes brew-bubble {
+  from {
+    transform: translateY(0);
+    opacity: 0.9;
+  }
+  to {
+    transform: translateY(-22px);
+    opacity: 0;
+  }
+}
+
+.brew-bubble {
+  animation: brew-bubble 1.4s ease-in infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pin-pulse,
+  .brew-bubble {
+    animation: none;
+  }
+}
