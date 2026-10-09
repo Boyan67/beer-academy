@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { COURSES, courseLessons } from "@/course/courses";
+import { COURSES, courseLessons, learnThenQuiz } from "@/course/courses";
 import { checkAnswer } from "@/course/questions";
 import type { Question } from "@/course/types";
 import { BEER_STYLES } from "@/lib/beer-guide/styles";
@@ -34,6 +34,13 @@ describe("content", () => {
       }
     }
   });
+});
+
+it("lessons teach first, quiz after", () => {
+  for (const l of lessons) {
+    const kinds = learnThenQuiz(l.steps()).map((s) => ("card" in s ? "c" : "q")).join("");
+    expect(kinds, l.id).toMatch(/^c+q+$/);
+  }
 });
 
 describe("checkAnswer", () => {

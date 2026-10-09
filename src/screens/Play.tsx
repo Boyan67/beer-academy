@@ -3,7 +3,7 @@ import confetti from "canvas-confetti";
 import { Award, Brain, RotateCcw, Star, Target, Timer } from "lucide-react";
 
 import Player, { type Result } from "@/components/Player";
-import { PASS_SCORE, TEST_SECONDS, TEST_SIZE, courseLessons, findLesson, getCourse, testQuestions } from "@/course/courses";
+import { PASS_SCORE, TEST_SECONDS, TEST_SIZE, courseLessons, findLesson, getCourse, learnThenQuiz, testQuestions } from "@/course/courses";
 import { sample } from "@/course/questions";
 import { XP } from "@/progress";
 import { dueReviews, useProgress } from "@/store";
@@ -51,7 +51,7 @@ const secondaryBtn = "w-full rounded-xl border-2 border-stone-300 bg-white py-3 
 export function LessonScreen({ id }: { id: string }) {
   const found = findLesson(id);
   const finishLesson = useProgress((s) => s.finishLesson);
-  const [steps] = useState(() => found?.lesson.steps() ?? []);
+  const [steps] = useState(() => learnThenQuiz(found?.lesson.steps() ?? []));
   const [result, setResult] = useState<Result>();
   if (!found) return <NotFound />;
   const { course, lesson } = found;

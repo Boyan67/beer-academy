@@ -1,8 +1,9 @@
-import { BASICS_LESSONS } from "@/course/basics";
+import { BASICS_LESSONS, BREWING_LESSONS } from "@/course/basics";
 import { handwritten } from "@/course/handwritten";
 import { sample, shuffle, styleQuestions } from "@/course/questions";
 import type { Course, Lesson, Question, Step, StylePart } from "@/course/types";
 import { getStyleBySlug } from "@/lib/beer-guide/styles";
+import { ClipboardCheck } from "lucide-react";
 
 const part = (slug: string, p: StylePart): Step => ({ card: { kind: "style", slug, part: p } });
 const ask = (q: Question): Step => ({ question: q });
@@ -55,8 +56,11 @@ export const COURSES: Course[] = [
   {
     id: "basics",
     title: "Основи",
-    description: "Числата, малцът, хмелът, маята, дегустацията и чашите.",
-    chapters: [{ title: "Как да четеш бира", lessons: BASICS_LESSONS }],
+    description: "Съставките, варенето, дегустацията, дефектите, чашите и храната.",
+    chapters: [
+      { title: "Как да четеш бира", lessons: BASICS_LESSONS },
+      { title: "От казана до масата", lessons: BREWING_LESSONS },
+    ],
   },
   {
     id: "lagers",
@@ -97,3 +101,19 @@ export const PASS_SCORE = 0.8;
 
 /** Twenty random questions from across the whole course. */
 export const testQuestions = (c: Course) => sample(courseLessons(c).flatMap((l) => l.pool()), TEST_SIZE);
+
+/** All the theory first, then the quiz — with a breather card between the two. */
+export function learnThenQuiz(steps: Step[]): Step[] {
+  const cards = steps.filter((s) => "card" in s);
+  const questions = steps.filter((s) => "question" in s);
+  if (!cards.length || !questions.length) return steps;
+  const intermission: Step = {
+    card: {
+      kind: "text",
+      title: "Време за проверка",
+      body: `Следват ${questions.length} въпроса върху това, което току-що научи. Грешните ще се върнат в Преговор.`,
+      icon: ClipboardCheck,
+    },
+  };
+  return [...cards, intermission, ...questions];
+}
