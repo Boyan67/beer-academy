@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { Award, Download, Flame, RotateCcw, Upload } from "lucide-react";
 
 import { COURSES } from "@/course/courses";
+import { PHOTO_CREDITS } from "@/lib/beer-guide/photos";
 import { LEVELS, addDays, dayKey, levelFor, streak } from "@/progress";
 import { exportBackup, importBackup, useProgress } from "@/store";
 import { go } from "@/screens/Home";
@@ -151,6 +152,28 @@ export function Profile() {
           <RotateCcw size={14} /> Изтрий прогреса
         </button>
       </section>
+
+      <details className="rounded-2xl bg-white p-4 text-sm text-stone-600">
+        <summary className="cursor-pointer font-bold text-stone-800">Снимки</summary>
+        <ul className="mt-2 space-y-1.5">
+          {PHOTO_CREDITS.map((c) => (
+            <li key={c.source}>
+              <a href={c.source} target="_blank" rel="noreferrer" className="font-semibold text-stone-800 underline">
+                {c.title}
+              </a>{" "}
+              — {c.author},{" "}
+              {c.licenseUrl ? (
+                <a href={c.licenseUrl} target="_blank" rel="noreferrer" className="underline">
+                  {c.license}
+                </a>
+              ) : (
+                c.license
+              )}
+              . Изрязана и смалена.
+            </li>
+          ))}
+        </ul>
+      </details>
     </div>
   );
 }

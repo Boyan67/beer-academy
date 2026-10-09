@@ -19,7 +19,14 @@ export function VisualView({ v, className = "h-36" }: { v: Visual; className?: s
   const id = useId().replace(/:/g, "");
   // Maps are wide; they size by width and ignore the height class.
   if (v.map) return <OriginMap origin={v.map} className="w-full max-w-sm" />;
-  if (v.img) return <img src={v.img} alt="" className={`${className} aspect-square rounded-full object-cover ring-1 ring-black/5`} />;
+  if (v.img)
+    return (
+      <img
+        src={v.img}
+        alt=""
+        className={`${className} object-cover ring-1 ring-black/5 ${v.tall ? "aspect-[2/5] rounded-xl" : "aspect-square rounded-full"}`}
+      />
+    );
   if (v.glass) return <BeerGlass id={id} shape={v.glass} ebc={v.ebc ?? [8, 12]} className={className} />;
   return null;
 }

@@ -6,7 +6,6 @@ import {
   Eye,
   Flame,
   Flower2,
-  Hop,
   Microscope,
   Package,
   Popcorn,
@@ -23,6 +22,7 @@ import {
 import { HOP_STAGES } from "@/lib/beer-guide/hops";
 import { MALT_IMAGES } from "@/lib/beer-guide/malts";
 import { METRIC_LIST } from "@/lib/beer-guide/metrics";
+import { PHOTOS } from "@/lib/beer-guide/photos";
 import { PROCESS_STEPS } from "@/lib/beer-guide/process";
 import { SENSORY_ASPECTS } from "@/lib/beer-guide/sensory";
 import type { GlassShape, MaltKey } from "@/lib/beer-guide/types";
@@ -119,7 +119,12 @@ const hops = lesson("hops", "Хмелът", { glass: "tulip", ebc: [10, 16] }, (
   card({
     title: "Хмелът е подправката",
     body: "Шишарките на хмела дават горчивина, аромат и пазят бирата от развала. Едно и също растение — три съвсем различни ефекта според това кога влиза.",
-    icon: Hop,
+    visual: { img: PHOTOS.hopCones },
+  }),
+  card({
+    title: "Шишарки и пелети",
+    body: "Пивоварите рядко слагат цели шишарки. Повечето хмел се смила и пресова на пелети — заемат по-малко място и пазят аромата по-дълго.",
+    visual: { img: PHOTOS.hopPellets },
   }),
   card({
     title: HOP_STAGES[0].label,
@@ -162,8 +167,8 @@ const hops = lesson("hops", "Хмелът", { glass: "tulip", ebc: [10, 16] }, (
 const yeast = lesson("yeast", "Маята", { glass: "weizen", ebc: [4, 12] }, () => [
   card({
     title: "Маята прави бирата",
-    body: "Пивоварът прави сладка пивна мъст. Бирата я прави маята — изяжда захарта и оставя алкохол, CO₂ и стотици ароматни молекули.",
-    icon: Microscope,
+    body: "Пивоварът прави сладка пивна мъст. Бирата я прави маята — изяжда захарта и оставя алкохол, CO₂ и стотици ароматни молекули. Под микроскоп: едноклетъчни гъбички, които се размножават чрез пъпкуване.",
+    visual: { img: PHOTOS.yeast },
   }),
   card({
     title: "Ейл — горна ферментация",
@@ -195,7 +200,7 @@ const tasting = lesson("tasting", "Дегустация", { glass: "tulip", ebc:
   card({
     title: "Гледай, мирисай, пий",
     body: `Съдиите попълват листа си в този ред: ${SENSORY_ASPECTS.map((a) => a.label.toLowerCase()).join(", ")}. Ароматите избледняват първи, затова се помирисва веднага.`,
-    icon: Eye,
+    visual: { img: PHOTOS.tastingFlight },
   }),
   card({
     title: SENSORY_ASPECTS[0].label,
@@ -365,7 +370,19 @@ const faults = lesson("faults", "Дефектите", { glass: "tumbler", ebc: [
       "Диацетил — ранна ферментация, ацеталдехид — млада бира, DMS — слабо варене, картон — стара бира.",
     ),
   ),
-  ask(pick("faults:light", "Коя бутилка пази най-добре от светлина?", ["Кафява", "Зелена", "Прозрачна", "Няма значение"], "Кафявото стъкло спира UV лъчите.")),
+  ask(
+    pictures(
+      "faults:light",
+      "Коя бутилка пази най-добре от светлина?",
+      [
+        { label: "Кафява", visual: { img: PHOTOS.bottleBrown, tall: true } },
+        { label: "Маслиненозелена", visual: { img: PHOTOS.bottleOlive, tall: true } },
+        { label: "Зелена", visual: { img: PHOTOS.bottleGreen, tall: true } },
+        { label: "Синя", visual: { img: PHOTOS.bottleBlue, tall: true } },
+      ],
+      "Кафявото стъкло спира UV лъчите. Зеленото и синьото ги пропускат — и хмелът „скунсва“ за минути.",
+    ),
+  ),
 ]);
 
 const food = lesson("food", "Бира и храна", { glass: "tulip", ebc: [40, 70] }, () => [

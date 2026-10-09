@@ -8,6 +8,8 @@ export type Visual = {
   glass?: GlassShape;
   ebc?: Range;
   img?: string;
+  /** Show the photo as a tall card instead of a circle — for bottles. */
+  tall?: boolean;
   /** The outline map with this place pinned. */
   map?: Origin;
 };

@@ -111,7 +111,7 @@ function Pictures({ q, answer, onAnswer, revealed }: Props<"choice">) {
             aria-label={o.label}
             className={`relative flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 p-3 transition-colors ${tone}`}
           >
-            <VisualView v={o.visual!} className="h-28" />
+            <VisualView v={o.visual!} className={o.visual!.tall ? "h-40" : "h-28"} />
             {revealed && <span className="text-center text-sm font-bold leading-tight">{o.label}</span>}
             {state === "right" && <Check className="absolute right-2 top-2 text-emerald-600" size={20} />}
             {state === "wrong" && <X className="absolute right-2 top-2 text-rose-600" size={20} />}

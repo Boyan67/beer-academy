@@ -11,7 +11,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "apple-touch-icon-180x180.png", "malts/*.jpg"],
+      includeAssets: ["favicon.ico", "apple-touch-icon-180x180.png", "malts/*.jpg", "photos/*.jpg"],
       workbox: { globPatterns: ["**/*.{js,css,html,svg,png,jpg,woff2}"] },
       manifest: {
         name: "Бира Академия",
