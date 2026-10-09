@@ -1,0 +1,36 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme {
+  --font-sans: "Noto Sans", system-ui, sans-serif;
+  --color-brand: #233329;
+  --color-brand-hover: #2f4436;
+  --color-accent: #cf6911;
+  --color-accent-dark: #b85e0f;
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  @apply bg-stone-100 text-stone-900 antialiased;
+}
+
+/* The page is a phone-width column even on desktop. */
+#root {
+  @apply mx-auto min-h-dvh max-w-lg;
+}
+
+input[type="range"] {
+  accent-color: var(--color-accent);
+}
+
+@media print {
+  body {
+    background: white;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
