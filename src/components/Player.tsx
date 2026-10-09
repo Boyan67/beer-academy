@@ -132,7 +132,7 @@ export default function Player({ steps, mode, timeLimit, onExit, onFinish }: Pro
         ) : null}
       </header>
 
-      <main key={index} className="flex-1 px-4 pb-40 pt-2 duration-300 animate-in fade-in slide-in-from-right-4">
+      <main key={index} className="flex-1 px-4 pb-6 pt-2 duration-300 animate-in fade-in slide-in-from-right-4">
         {"question" in step ? (
           <QuestionView q={step.question} answer={answer} onAnswer={setAnswer} revealed={revealed} />
         ) : (
@@ -140,8 +140,10 @@ export default function Player({ steps, mode, timeLimit, onExit, onFinish }: Pro
         )}
       </main>
 
+      {/* Sticky, not fixed: it stays in the flow, so however tall the feedback
+          gets, the end of the question can still be scrolled into view above it. */}
       <footer
-        className={`fixed inset-x-0 bottom-0 z-10 mx-auto max-w-lg border-t px-4 pb-[max(16px,env(safe-area-inset-bottom))] pt-4 ${
+        className={`sticky bottom-0 z-10 border-t px-4 pb-[max(16px,env(safe-area-inset-bottom))] pt-4 ${
           revealed ? (isRight ? "border-emerald-200 bg-emerald-50" : "border-rose-200 bg-rose-50") : "border-stone-200 bg-stone-100"
         }`}
       >
