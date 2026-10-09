@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CircleCheck, CircleX, Timer, X } from "lucide-react";
 
 import { CardView } from "@/components/Cards";
 import QuestionView, { sliderStart } from "@/components/QuestionView";
 import { checkAnswer } from "@/course/questions";
 import type { Answer, Question, Step } from "@/course/types";
+import { useLeaveGuard } from "@/nav";
 import { useProgress, type Mode } from "@/store";
 
 export type Result = { correct: number; total: number };
@@ -18,6 +19,11 @@ type Props = {
   onFinish: (r: Result) => void;
 };
 
+const LEAVE: Record<Exclude<Mode, "review">, string> = {
+  lesson: "Да прекъснеш ли урока? Прогресът в него ще се загуби.",
+  test: "Да прекъснеш ли теста? Този опит няма да се зачете.",
+};
+
 const defaultAnswer = (q: Question): Answer | undefined => (q.kind === "slider" ? sliderStart(q) : undefined);
 
 const ready = (q: Question, a: Answer | undefined) =>
@@ -29,7 +35,11 @@ export default function Player({ steps, mode, timeLimit, onExit, onFinish }: Pro
   const [answer, setAnswer] = useState<Answer | undefined>();
   const [revealed, setRevealed] = useState(false);
   const [score, setScore] = useState<Result>({ correct: 0, total: 0 });
-  const [left, setLeft] = useState(timeLimit ?? 0);
+  // A deadline, not a countdown: phones throttle timers in the background, so
+  // switching apps would otherwise stop the clock.
+  const [deadline] = useState(() => Date.now() + (timeLimit ?? 0) * 1000);
+  const [now, setNow] = useState(Date.now);
+  const left = timeLimit ? Math.max(0, Math.ceil((deadline - now) / 1000)) : 0;
 
   const step = steps[index];
   const q = "question" in step ? step.question : undefined;
@@ -38,8 +48,13 @@ export default function Player({ steps, mode, timeLimit, onExit, onFinish }: Pro
 
   useEffect(() => {
     if (!timeLimit) return;
-    const t = setInterval(() => setLeft((s) => Math.max(0, s - 1)), 1000);
-    return () => clearInterval(t);
+    const tick = () => setNow(Date.now());
+    const t = setInterval(tick, 1000);
+    document.addEventListener("visibilitychange", tick);
+    return () => {
+      clearInterval(t);
+      document.removeEventListener("visibilitychange", tick);
+    };
   }, [timeLimit]);
 
   // Time's up: unanswered questions count as wrong.
@@ -66,8 +81,15 @@ export default function Player({ steps, mode, timeLimit, onExit, onFinish }: Pro
     }
   };
 
+  // Review answers are saved one by one, so leaving one loses nothing.
+  const leaving = useRef(false);
+  const canLeave = () => leaving.current || index === 0 || mode === "review" || confirm(LEAVE[mode]);
+  useLeaveGuard(canLeave);
+
   const exit = () => {
-    if (index === 0 || confirm("Да прекъснеш ли? Прогресът в този урок ще се загуби.")) onExit();
+    if (!canLeave()) return;
+    leaving.current = true;
+    onExit();
   };
 
   const primary = !q

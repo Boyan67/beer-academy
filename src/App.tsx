@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Brain, GraduationCap, User } from "lucide-react";
 
+import { mayLeave } from "@/nav";
 import { CertificateScreen } from "@/screens/Certificate";
 import { CourseMap, Home, NotFound } from "@/screens/Home";
 import { LessonScreen, ReviewScreen, ReviewSession, TestScreen } from "@/screens/Play";
@@ -10,7 +11,14 @@ import { dueReviews, useProgress } from "@/store";
 function useHash() {
   const [hash, setHash] = useState(location.hash);
   useEffect(() => {
+    let undoing = false;
     const onChange = () => {
+      // The back button already moved us; step forward again to stay put.
+      if (undoing) return void (undoing = false);
+      if (!mayLeave()) {
+        undoing = true;
+        return history.forward();
+      }
       setHash(location.hash);
       window.scrollTo(0, 0);
     };
