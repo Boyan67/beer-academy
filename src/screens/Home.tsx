@@ -74,8 +74,8 @@ export function Home() {
         >
           {next.lesson.visual && <VisualView v={next.lesson.visual} className="h-16 shrink-0" />}
           <div className="flex-1">
-            <p className="text-xs font-bold uppercase tracking-wider text-accent">Продължи</p>
-            <p className="text-lg font-extrabold">{next.lesson.title}</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-accent">Продължи</p>
+            <p className="text-xl font-bold">{next.lesson.title}</p>
           </div>
           <span className="flex h-11 w-11 items-center justify-center rounded-full bg-accent text-white">
             <Play size={20} fill="currentColor" />
@@ -83,7 +83,7 @@ export function Home() {
         </button>
       )}
 
-      <h2 className="px-1 text-sm font-bold uppercase tracking-wider text-stone-500">Курсове</h2>
+      <h2 className="px-1 text-sm font-semibold uppercase tracking-wider text-stone-500">Курсове</h2>
       {COURSES.map((c) => {
         const states = lessonStates(c, completed);
         const done = states.filter((s) => s.done).length;
@@ -95,11 +95,11 @@ export function Home() {
             className="w-full rounded-2xl border border-stone-200 bg-white p-4 text-left hover:border-stone-300"
           >
             <div className="flex items-center gap-2">
-              <h3 className="flex-1 text-lg font-extrabold">{c.title}</h3>
+              <h3 className="flex-1 text-xl font-bold">{c.title}</h3>
               {certificates[c.id] && <Award className="text-accent" size={22} aria-label="Сертификат" />}
               <ChevronRight className="text-stone-400" size={20} />
             </div>
-            <p className="mt-0.5 text-[15px] text-stone-600">{c.description}</p>
+            <p className="mt-0.5 text-base text-stone-600">{c.description}</p>
             <div className="mt-3 flex items-center gap-3">
               <div className="h-2 flex-1 overflow-hidden rounded-full bg-stone-100">
                 <div className="h-full rounded-full bg-brand" style={{ width: `${(done / states.length) * 100}%` }} />
@@ -127,7 +127,7 @@ export function CourseMap({ id }: { id: string }) {
   return (
     <div className="space-y-6 p-4 pt-[max(16px,env(safe-area-inset-top))]">
       <header className="flex items-center gap-2">
-        <button type="button" onClick={() => go("#/")} aria-label="Назад" className="rounded-full p-1.5 hover:bg-stone-200">
+        <button type="button" onClick={() => go("#/")} aria-label="Назад" className="-ml-2 flex h-11 w-11 items-center justify-center rounded-full hover:bg-stone-200">
           <ChevronLeft size={24} />
         </button>
         <h1 className="text-2xl font-extrabold">{course.title}</h1>
@@ -135,7 +135,7 @@ export function CourseMap({ id }: { id: string }) {
 
       {course.chapters.map((ch) => (
         <section key={ch.title} className="space-y-2">
-          <h2 className="px-1 text-sm font-bold uppercase tracking-wider text-stone-500">{ch.title}</h2>
+          <h2 className="px-1 text-sm font-semibold uppercase tracking-wider text-stone-500">{ch.title}</h2>
           {ch.lessons.map((l) => {
             const s = states.get(l.id)!;
             return (
@@ -144,10 +144,10 @@ export function CourseMap({ id }: { id: string }) {
                 type="button"
                 disabled={!s.open}
                 onClick={() => go(`#/lesson/${l.id}`)}
-                className="flex w-full items-center gap-3 rounded-2xl border border-stone-200 bg-white p-3 text-left enabled:hover:border-stone-300 disabled:opacity-50"
+                className="flex w-full items-center gap-3 rounded-2xl border border-stone-200 bg-white p-3 text-left enabled:hover:border-stone-300 disabled:bg-stone-50"
               >
-                {l.visual && <VisualView v={l.visual} className="h-12 shrink-0" />}
-                <span className="flex-1 font-bold">{l.title}</span>
+                {l.visual && <VisualView v={l.visual} empty={!s.open} className="h-12 shrink-0" />}
+                <span className={`flex-1 font-bold ${s.open ? "" : "text-stone-400"}`}>{l.title}</span>
                 {s.done ? (
                   <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
                     <Check size={18} strokeWidth={3} />
@@ -169,7 +169,7 @@ export function CourseMap({ id }: { id: string }) {
         <div className="flex items-center gap-3">
           <Award size={28} className="text-accent" />
           <div className="flex-1">
-            <h2 className="text-lg font-extrabold">Финален тест</h2>
+            <h2 className="text-xl font-bold">Финален тест</h2>
             <p className="text-sm text-white/70">
               {cert
                 ? `Взет с ${Math.round(cert.score * 100)}%`
@@ -184,12 +184,12 @@ export function CourseMap({ id }: { id: string }) {
             type="button"
             disabled={!allDone}
             onClick={() => go(`#/test/${course.id}`)}
-            className="flex-1 rounded-xl bg-accent py-3 font-extrabold enabled:hover:bg-accent-dark disabled:opacity-40"
+            className="flex-1 rounded-xl bg-accent py-3 font-bold enabled:hover:bg-accent-dark disabled:bg-white/10 disabled:text-white/40"
           >
             {cert ? "Пробвай пак" : "Започни теста"}
           </button>
           {cert && (
-            <button type="button" onClick={() => go(`#/cert/${course.id}`)} className="flex-1 rounded-xl bg-white/10 py-3 font-extrabold hover:bg-white/20">
+            <button type="button" onClick={() => go(`#/cert/${course.id}`)} className="flex-1 rounded-xl bg-white/10 py-3 font-bold hover:bg-white/20">
               Сертификат
             </button>
           )}
@@ -202,7 +202,7 @@ export function CourseMap({ id }: { id: string }) {
 export function NotFound() {
   return (
     <div className="p-8 text-center">
-      <p className="mb-4 text-lg font-bold">Тази страница не съществува.</p>
+      <p className="mb-4 text-xl font-bold">Тази страница не съществува.</p>
       <button type="button" onClick={() => go("#/")} className="rounded-xl bg-brand px-5 py-3 font-bold text-white">
         Към началото
       </button>

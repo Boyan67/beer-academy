@@ -11,8 +11,6 @@ import {
 } from "@/lib/beer-guide/malts";
 import type { MaltComponent } from "@/lib/beer-guide/types";
 
-const ACCENT = "#a16207";
-
 type Props = {
   malts: MaltComponent[];
   /** The prose bill, revealed by the info icon. */
@@ -31,14 +29,13 @@ export default function MaltBreakdown({ malts, text }: Props) {
     <Section
       icon={Wheat}
       title="Малц"
-      accent={ACCENT}
       action={
         <button
           type="button"
           onClick={() => setShowText((open) => !open)}
           aria-expanded={showText}
           aria-label={showText ? "Скрий описанието" : "Покажи пълното описание"}
-          className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${
+          className={`-my-2 -mr-2 flex h-11 w-11 items-center justify-center rounded-full transition-colors ${
             showText
               ? "bg-stone-100"
               : "text-stone-400 hover:bg-stone-100 hover:text-stone-600"
@@ -49,7 +46,7 @@ export default function MaltBreakdown({ malts, text }: Props) {
       }
     >
       {showText && (
-        <p className="mb-5 rounded-xl bg-stone-50 p-3.5 text-[14px] leading-relaxed text-stone-600 duration-300 animate-in fade-in slide-in-from-top-1">
+        <p className="mb-5 rounded-xl bg-stone-50 p-3.5 text-sm leading-relaxed text-stone-600 duration-300 animate-in fade-in slide-in-from-top-1">
           {text}
         </p>
       )}
@@ -82,10 +79,10 @@ export default function MaltBreakdown({ malts, text }: Props) {
                 </div>
               </div>
 
-              <div className="mt-3 text-lg font-extrabold leading-none tabular-nums text-stone-900">
+              <div className="mt-3 text-xl font-extrabold leading-none tabular-nums text-stone-900">
                 {formatShare(malt.share)}
               </div>
-              <div className="mt-1 text-center text-[12px] leading-snug text-stone-700">
+              <div className="mt-1 text-center text-xs leading-snug text-stone-700">
                 {malt.name}
               </div>
             </div>

@@ -159,6 +159,8 @@ type Props = {
   id: string;
   /** Glassware the style is served in. */
   shape?: GlassShape;
+  /** Outline only, nothing poured — used for locked lessons. */
+  empty?: boolean;
   className?: string;
 };
 
@@ -167,6 +169,7 @@ export default function BeerGlass({
   ebc,
   id,
   shape = "tumbler",
+  empty = false,
   className,
 }: Props) {
   const clipId = `glass-clip-${id}`;
@@ -182,7 +185,7 @@ export default function BeerGlass({
       viewBox={viewBox}
       className={className}
       role="img"
-      aria-label={`Цвят на бирата: ${ebc[0]}–${ebc[1]} EBC`}
+      aria-label={empty ? "Празна чаша" : `Цвят на бирата: ${ebc[0]}–${ebc[1]} EBC`}
     >
       <defs>
         <clipPath id={clipId}>
@@ -194,29 +197,31 @@ export default function BeerGlass({
         </linearGradient>
       </defs>
 
-      <g clipPath={`url(#${clipId})`}>
-        <rect
-          x={boxX}
-          y={spec.foamBottom}
-          width={boxWidth}
-          height={liquidBottom - spec.foamBottom}
-          fill={`url(#${fillId})`}
-        />
-        <rect
-          x={boxX}
-          y={spec.foamTop}
-          width={boxWidth}
-          height={spec.foamBottom - spec.foamTop}
-          fill="#fffdf7"
-        />
-      </g>
+      {!empty && (
+        <g clipPath={`url(#${clipId})`}>
+          <rect
+            x={boxX}
+            y={spec.foamBottom}
+            width={boxWidth}
+            height={liquidBottom - spec.foamBottom}
+            fill={`url(#${fillId})`}
+          />
+          <rect
+            x={boxX}
+            y={spec.foamTop}
+            width={boxWidth}
+            height={spec.foamBottom - spec.foamTop}
+            fill="#fffdf7"
+          />
+        </g>
+      )}
 
       {spec.strokes.map((d) => (
         <path
           key={d}
           d={d}
           fill="none"
-          stroke="#a8a29e"
+          stroke={empty ? "#d6d3d1" : "#a8a29e"}
           strokeWidth={spec.strokeWidth ?? DEFAULT_STROKE}
           strokeLinecap="round"
           strokeLinejoin="round"

@@ -22,7 +22,6 @@ export const METRICS: Record<MetricKey, MetricDefinition> = {
     unit: "",
     decimals: 3,
     scale: [1.028, 1.115],
-    color: "#c2410c",
     icon: Gauge,
   },
   fg: {
@@ -33,7 +32,6 @@ export const METRICS: Record<MetricKey, MetricDefinition> = {
     unit: "",
     decimals: 3,
     scale: [1.002, 1.03],
-    color: "#0e7490",
     icon: FlaskConical,
   },
   ibu: {
@@ -44,7 +42,6 @@ export const METRICS: Record<MetricKey, MetricDefinition> = {
     unit: "",
     decimals: 0,
     scale: [0, 90],
-    color: "#4d7c0f",
     icon: Hop,
   },
   ebc: {
@@ -57,7 +54,6 @@ export const METRICS: Record<MetricKey, MetricDefinition> = {
     scale: [0, 80],
     // Compressed: без това всички светли стилове се сливат в една точка.
     curve: 0.5,
-    color: "#a16207",
     icon: Palette,
   },
   abv: {
@@ -68,7 +64,6 @@ export const METRICS: Record<MetricKey, MetricDefinition> = {
     unit: "%",
     decimals: 1,
     scale: [2.8, 12],
-    color: "#be123c",
     icon: Flame,
   },
   bugu: {
@@ -79,7 +74,6 @@ export const METRICS: Record<MetricKey, MetricDefinition> = {
     unit: "",
     decimals: 2,
     scale: [0, 1.3],
-    color: "#7c3aed",
     icon: Scale,
   },
 };

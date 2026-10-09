@@ -42,20 +42,9 @@ export function Profile() {
     <div className="space-y-5 p-4 pt-[max(16px,env(safe-area-inset-top))]">
       <h1 className="text-2xl font-extrabold">Профил</h1>
 
-      <label className="block rounded-2xl bg-white p-4">
-        <span className="text-sm font-bold text-stone-600">Име (за сертификатите)</span>
-        <input
-          className="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2"
-          key={s.name}
-          defaultValue={s.name}
-          placeholder="Име и фамилия"
-          onBlur={(e) => s.set({ name: e.target.value.trim() })}
-        />
-      </label>
-
       <section className="rounded-2xl bg-white p-4">
         <div className="flex items-baseline justify-between">
-          <h2 className="text-lg font-extrabold">{level.name}</h2>
+          <h2 className="text-xl font-bold">{level.name}</h2>
           <span className="text-sm font-bold tabular-nums text-stone-500">{s.xp} XP</span>
         </div>
         <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-stone-100">
@@ -69,7 +58,7 @@ export function Profile() {
       <section className="rounded-2xl bg-white p-4">
         <div className="flex items-center gap-2">
           <Flame className="text-accent" fill="currentColor" size={22} />
-          <h2 className="text-lg font-extrabold">
+          <h2 className="text-xl font-bold">
             {days} {days === 1 ? "ден" : "дни"} поред
           </h2>
         </div>
@@ -78,7 +67,7 @@ export function Profile() {
             const hit = (s.xpByDay[dayKey(d)] ?? 0) >= s.dailyGoal;
             return (
               <div key={dayKey(d)}>
-                <div className="text-xs font-bold uppercase text-stone-500">{d.toLocaleDateString("bg-BG", { weekday: "narrow" })}</div>
+                <div className="text-xs font-semibold uppercase text-stone-500">{d.toLocaleDateString("bg-BG", { weekday: "narrow" })}</div>
                 <div
                   className={`mx-auto mt-1 flex h-9 w-9 items-center justify-center rounded-full ${hit ? "bg-accent text-white" : "bg-stone-100 text-stone-300"}`}
                 >
@@ -92,7 +81,7 @@ export function Profile() {
 
       <fieldset className="rounded-2xl bg-white p-4">
         <legend className="sr-only">Дневна цел</legend>
-        <h2 className="mb-3 text-lg font-extrabold">Дневна цел</h2>
+        <h2 className="mb-3 text-xl font-bold">Дневна цел</h2>
         <div className="grid grid-cols-3 gap-2">
           {GOALS.map((g) => (
             <button
@@ -112,7 +101,7 @@ export function Profile() {
 
       {COURSES.some((c) => s.certificates[c.id]) && (
         <section className="rounded-2xl bg-white p-4">
-          <h2 className="mb-2 text-lg font-extrabold">Сертификати</h2>
+          <h2 className="mb-2 text-xl font-bold">Сертификати</h2>
           {COURSES.filter((c) => s.certificates[c.id]).map((c) => (
             <button
               key={c.id}
@@ -127,8 +116,21 @@ export function Profile() {
         </section>
       )}
 
+      <h2 className="px-1 pt-2 text-sm font-semibold uppercase tracking-wider text-stone-500">Настройки</h2>
+
+      <label className="block rounded-2xl bg-white p-4">
+        <span className="text-sm font-bold text-stone-600">Име (за сертификатите)</span>
+        <input
+          className="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2"
+          key={s.name}
+          defaultValue={s.name}
+          placeholder="Име и фамилия"
+          onBlur={(e) => s.set({ name: e.target.value.trim() })}
+        />
+      </label>
+
       <section className="space-y-2 rounded-2xl bg-white p-4">
-        <h2 className="text-lg font-extrabold">Резервно копие</h2>
+        <h2 className="text-xl font-bold">Резервно копие</h2>
         <p className="text-sm text-stone-500">Прогресът се пази само на това устройство. Свали копие, за да го пренесеш или да не го загубиш.</p>
         <div className="flex gap-2">
           <button type="button" onClick={download} className="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-stone-200 py-2.5 font-bold hover:border-stone-300">
@@ -146,7 +148,7 @@ export function Profile() {
         <button
           type="button"
           onClick={() => confirm("Изтриване на целия прогрес? Това не може да се върне.") && s.reset()}
-          className="flex items-center gap-1.5 pt-2 text-sm font-semibold text-rose-600 hover:underline"
+          className="-mb-2 flex items-center gap-1.5 py-3 text-sm font-semibold text-rose-600 hover:underline"
         >
           <RotateCcw size={14} /> Изтрий прогреса
         </button>

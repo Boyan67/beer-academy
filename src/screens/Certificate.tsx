@@ -17,7 +17,7 @@ export function CertificateScreen({ id }: { id: string }) {
   return (
     <div className="space-y-5 p-4 pt-[max(16px,env(safe-area-inset-top))]">
       <header className="no-print flex items-center gap-2">
-        <button type="button" onClick={() => go(`#/course/${id}`)} aria-label="Назад" className="rounded-full p-1.5 hover:bg-stone-200">
+        <button type="button" onClick={() => go(`#/course/${id}`)} aria-label="Назад" className="-ml-2 flex h-11 w-11 items-center justify-center rounded-full hover:bg-stone-200">
           <ChevronLeft size={24} />
         </button>
         <h1 className="text-2xl font-extrabold">Сертификат</h1>
@@ -36,7 +36,7 @@ export function CertificateScreen({ id }: { id: string }) {
 
       <article className="rounded-2xl border-[6px] border-double border-brand bg-[#fffdf7] px-6 py-10 text-center">
         <Award className="mx-auto text-accent" size={52} />
-        <p className="mt-3 text-xs font-bold uppercase tracking-[0.25em] text-stone-500">Бира Академия · Сертификат</p>
+        <p className="mt-3 text-xs font-semibold uppercase tracking-[0.25em] text-stone-500">Бира Академия · Сертификат</p>
         <p className="mt-6 text-sm text-stone-500">Удостоверява, че</p>
         <p className="mt-1 text-3xl font-extrabold text-brand">{name || "…"}</p>
         <p className="mt-4 text-sm text-stone-500">завърши успешно курса</p>
@@ -58,7 +58,7 @@ export function CertificateScreen({ id }: { id: string }) {
         <button
           type="button"
           onClick={() => print()}
-          className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand py-3.5 font-extrabold text-white hover:bg-brand-hover"
+          className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand py-3.5 font-bold text-white hover:bg-brand-hover"
         >
           <Printer size={18} /> PDF / Печат
         </button>
@@ -66,7 +66,7 @@ export function CertificateScreen({ id }: { id: string }) {
           <button
             type="button"
             onClick={() => navigator.share({ title: "Бира Академия", text }).catch(() => {})}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-accent py-3.5 font-extrabold text-white hover:bg-accent-dark"
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-accent py-3.5 font-bold text-white hover:bg-accent-dark"
           >
             <Share2 size={18} /> Сподели
           </button>

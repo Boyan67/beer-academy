@@ -28,7 +28,6 @@ export type MetricDefinition = {
    * reach 79 and would flatten everything else.
    */
   curve?: number;
-  color: string;
   icon: LucideIcon;
 };
 

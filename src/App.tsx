@@ -42,7 +42,7 @@ function TabBar({ route }: { route: string }) {
             <Icon size={24} strokeWidth={active ? 2.5 : 2} />
             {label}
             {r === "review" && due > 0 && (
-              <span className="absolute left-1/2 top-1.5 ml-2 min-w-5 rounded-full bg-accent px-1.5 text-[11px] leading-5 text-white">{due}</span>
+              <span className="absolute left-1/2 top-1.5 ml-2 min-w-5 rounded-full bg-accent px-1.5 text-xs leading-5 text-white">{due}</span>
             )}
           </a>
         );

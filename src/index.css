@@ -7,6 +7,13 @@
   --color-brand-hover: #2f4436;
   --color-accent: #cf6911;
   --color-accent-dark: #b85e0f;
+
+  /* Type scale: 12 / 14 / 16 / 20 / 28 / 36 — text-xs, sm, base, xl, 2xl, 3xl.
+     lg and 4xl are left out on purpose. */
+  --text-2xl: 1.75rem;
+  --text-2xl--line-height: 1.2;
+  --text-3xl: 2.25rem;
+  --text-3xl--line-height: 1.15;
 }
 
 html {
@@ -20,6 +27,11 @@ body {
 /* The page is a phone-width column even on desktop. */
 #root {
   @apply mx-auto min-h-dvh max-w-lg;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 input[type="range"] {

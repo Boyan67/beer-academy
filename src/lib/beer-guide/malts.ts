@@ -30,9 +30,9 @@ const MIN_DIAMETER = 38;
  * Three malts is the most any style in the guide uses.
  */
 export function maltTrack(count: number): number {
-  if (count <= 1) return 124;
-  if (count === 2) return 112;
-  return 88;
+  if (count <= 1) return 184;
+  if (count === 2) return 144;
+  return 96;
 }
 
 /**

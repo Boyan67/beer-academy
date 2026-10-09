@@ -191,7 +191,7 @@ export default function StyleRadar({
               dominantBaseline="middle"
               fontSize={g.fontSize}
               fontWeight="700"
-              fill={metric.color}
+              fill="#78716c"
             >
               {metric.label}
             </text>

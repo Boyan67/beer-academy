@@ -9,7 +9,17 @@ import { XP } from "@/progress";
 import { dueReviews, useProgress } from "@/store";
 import { NotFound, go, lessonStates } from "@/screens/Home";
 
-const celebrate = () => confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 }, disableForReducedMotion: true });
+const celebrate = () =>
+  confetti({
+    particleCount: 120,
+    spread: 80,
+    origin: { y: 0.6 },
+    colors: ["#cf6911", "#f3a417", "#fffdf7", "#233329"],
+    disableForReducedMotion: true,
+  });
+
+/** Below this a lesson ends on "repeat it", not on the next one. */
+const RETRY_BELOW = 0.6;
 
 function Done({
   title,
@@ -25,7 +35,7 @@ function Done({
   const pct = result.total ? Math.round((result.correct / result.total) * 100) : 100;
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center gap-6 p-6 text-center duration-500 animate-in fade-in zoom-in-95">
-      <h1 className="text-3xl font-extrabold">{title}</h1>
+      <h1 className="text-2xl font-extrabold">{title}</h1>
       <div className="grid w-full grid-cols-2 gap-3">
         <div className="rounded-2xl bg-white p-4">
           <Star className="mx-auto text-amber-500" fill="currentColor" />
@@ -45,39 +55,58 @@ function Done({
   );
 }
 
-const primaryBtn = "w-full rounded-xl bg-brand py-3.5 text-[17px] font-extrabold text-white hover:bg-brand-hover";
+const primaryBtn = "w-full rounded-xl bg-brand py-3.5 text-base font-bold text-white hover:bg-brand-hover";
 const secondaryBtn = "w-full rounded-xl border-2 border-stone-300 bg-white py-3 font-bold text-stone-700 hover:border-stone-400";
 
 export function LessonScreen({ id }: { id: string }) {
   const found = findLesson(id);
   const finishLesson = useProgress((s) => s.finishLesson);
-  const [steps] = useState(() => learnThenQuiz(found?.lesson.steps() ?? []));
+  const newSteps = () => learnThenQuiz(found?.lesson.steps() ?? []);
+  const [steps, setSteps] = useState(newSteps);
   const [result, setResult] = useState<Result>();
   if (!found) return <NotFound />;
   const { course, lesson } = found;
 
   if (result) {
-    const perfect = result.correct === result.total;
+    const score = result.total ? result.correct / result.total : 1;
+    const perfect = score === 1;
+    const weak = score < RETRY_BELOW;
     const lessons = courseLessons(course);
     const next = lessons[lessons.findIndex((l) => l.id === id) + 1];
+    const retry = () => {
+      setSteps(newSteps());
+      setResult(undefined);
+    };
+    const onward = next
+      ? { label: `Следващ: ${next.title}`, onClick: () => go(`#/lesson/${next.id}`) }
+      : { label: "Към финалния тест", onClick: () => go(`#/course/${course.id}`) };
     return (
       <Done
-        title={perfect ? "Безупречно!" : "Урокът е завършен!"}
+        title={perfect ? "Безупречно!" : weak ? "Има какво да затвърдиш" : "Урокът е завършен!"}
         result={result}
         xp={result.correct * XP.correct + XP.lesson + (perfect ? XP.perfect : 0)}
       >
-        {next ? (
-          <button type="button" className={primaryBtn} onClick={() => go(`#/lesson/${next.id}`)}>
-            Следващ: {next.title}
-          </button>
+        {weak ? (
+          <>
+            <p className="text-stone-600">Грешните въпроси те чакат в Преговор.</p>
+            <button type="button" className={primaryBtn} onClick={retry}>
+              <RotateCcw className="-mt-1 mr-2 inline" size={18} />
+              Повтори урока
+            </button>
+            <button type="button" className={secondaryBtn} onClick={onward.onClick}>
+              {onward.label}
+            </button>
+          </>
         ) : (
-          <button type="button" className={primaryBtn} onClick={() => go(`#/course/${course.id}`)}>
-            Към финалния тест
-          </button>
+          <>
+            <button type="button" className={primaryBtn} onClick={onward.onClick}>
+              {onward.label}
+            </button>
+            <button type="button" className={secondaryBtn} onClick={() => go(`#/course/${course.id}`)}>
+              Към курса
+            </button>
+          </>
         )}
-        <button type="button" className={secondaryBtn} onClick={() => go(`#/course/${course.id}`)}>
-          Към курса
-        </button>
       </Done>
     );
   }
@@ -91,9 +120,10 @@ export function LessonScreen({ id }: { id: string }) {
       mode="lesson"
       onExit={() => go(`#/course/${course.id}`)}
       onFinish={(r) => {
-        finishLesson(lesson.id, r.total ? r.correct / r.total : 1);
+        const score = r.total ? r.correct / r.total : 1;
+        finishLesson(lesson.id, score);
         setResult(r);
-        celebrate();
+        if (score >= PASS_SCORE) celebrate();
       }}
     />
   );

@@ -57,7 +57,7 @@ function OptionButton({
       disabled={disabled}
       onClick={onClick}
       aria-pressed={selected}
-      className={`flex w-full items-center gap-3 rounded-xl border-2 px-4 py-3.5 text-left text-[16px] font-semibold transition-colors ${tone}`}
+      className={`flex w-full items-center gap-3 rounded-xl border-2 px-4 py-3.5 text-left text-base font-semibold transition-colors ${tone}`}
     >
       {marker}
       <span className="flex-1">{label}</span>
@@ -138,7 +138,7 @@ function Order({ q, answer, onAnswer, revealed }: Props<"order">) {
           );
         })}
       </ol>
-      <div className="flex justify-between px-1 text-xs font-bold uppercase tracking-wider text-stone-500">
+      <div className="flex justify-between px-1 text-xs font-semibold uppercase tracking-wider text-stone-500">
         <span>1 = {q.hint[0]}</span>
         <span>
           {q.items.length} = {q.hint[1]}
@@ -170,8 +170,8 @@ function Slider({ q, answer, onAnswer, revealed }: Props<"slider">) {
   const pct = (v: number) => ((v - q.min) / (q.max - q.min)) * 100;
   return (
     <div className="space-y-3 rounded-2xl bg-white p-5">
-      <div className="text-center text-4xl font-extrabold tabular-nums">
-        {value} <span className="text-lg text-stone-500">{q.unit}</span>
+      <div className="text-center text-3xl font-extrabold tabular-nums">
+        {value} <span className="text-base text-stone-500">{q.unit}</span>
       </div>
       <div className="relative pt-2">
         {revealed && (

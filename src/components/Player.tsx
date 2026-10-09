@@ -79,7 +79,7 @@ export default function Player({ steps, mode, timeLimit, onExit, onFinish }: Pro
   return (
     <div className="flex min-h-dvh flex-col">
       <header className="sticky top-0 z-10 flex items-center gap-3 bg-stone-100/95 px-4 pb-3 pt-[max(12px,env(safe-area-inset-top))] backdrop-blur">
-        <button type="button" onClick={exit} aria-label="Затвори" className="rounded-full p-1.5 text-stone-500 hover:bg-stone-200">
+        <button type="button" onClick={exit} aria-label="Затвори" className="-ml-2 flex h-11 w-11 items-center justify-center rounded-full text-stone-500 hover:bg-stone-200">
           <X size={22} />
         </button>
         <div
@@ -99,11 +99,14 @@ export default function Player({ steps, mode, timeLimit, onExit, onFinish }: Pro
         ) : null}
       </header>
 
-      <main key={index} className="flex-1 px-4 pb-40 pt-2 duration-300 animate-in fade-in slide-in-from-right-4">
+      <main key={index} className="flex flex-1 flex-col px-4 pb-40 pt-2 duration-300 animate-in fade-in slide-in-from-right-4">
         {"question" in step ? (
           <QuestionView q={step.question} answer={answer} onAnswer={setAnswer} revealed={revealed} />
         ) : (
-          <CardView card={step.card} />
+          // Cards are whole screens: centred in the space above the footer, not pinned to the top.
+          <div className="my-auto">
+            <CardView card={step.card} />
+          </div>
         )}
       </main>
 
@@ -119,7 +122,7 @@ export default function Player({ steps, mode, timeLimit, onExit, onFinish }: Pro
               <p className={`font-extrabold ${isRight ? "text-emerald-700" : "text-rose-700"}`}>
                 {isRight ? "Точно така!" : "Не съвсем"}
               </p>
-              <p className="text-[15px] leading-snug text-stone-700">{q.explain}</p>
+              <p className="text-base leading-snug text-stone-700">{q.explain}</p>
             </div>
           </div>
         )}
@@ -127,7 +130,7 @@ export default function Player({ steps, mode, timeLimit, onExit, onFinish }: Pro
           type="button"
           disabled={!primary.enabled}
           onClick={primary.onClick}
-          className={`w-full rounded-xl py-3.5 text-[17px] font-extrabold text-white transition-colors disabled:bg-stone-300 ${
+          className={`w-full rounded-xl py-3.5 text-base font-bold text-white transition-colors disabled:bg-stone-300 ${
             revealed && !isRight ? "bg-rose-600 hover:bg-rose-700" : revealed ? "bg-emerald-600 hover:bg-emerald-700" : "bg-brand hover:bg-brand-hover"
           }`}
         >
