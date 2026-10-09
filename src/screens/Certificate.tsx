@@ -17,24 +17,24 @@ export function CertificateScreen({ id }: { id: string }) {
   return (
     <div className="space-y-5 p-4 pt-[max(16px,env(safe-area-inset-top))]">
       <header className="no-print flex items-center gap-2">
-        <button type="button" onClick={() => go(`#/course/${id}`)} aria-label="Назад" className="rounded-full p-1.5 hover:bg-stone-200">
+        <button type="button" onClick={() => go(`#/course/${id}`)} aria-label="Назад" className="rounded-full p-1.5 hover:bg-raised">
           <ChevronLeft size={24} />
         </button>
         <h1 className="text-2xl font-extrabold">Сертификат</h1>
       </header>
 
       {!name && (
-        <label className="no-print block rounded-2xl bg-white p-4">
-          <span className="text-sm font-bold text-stone-600">Как да изпишем името ти?</span>
+        <label className="no-print block rounded-2xl bg-surface p-4">
+          <span className="text-sm font-bold text-muted">Как да изпишем името ти?</span>
           <input
-            className="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2"
+            className="mt-2 w-full rounded-lg border border-line bg-raised px-3 py-2"
             placeholder="Име и фамилия"
             onBlur={(e) => set({ name: e.target.value.trim() })}
           />
         </label>
       )}
 
-      <article className="rounded-2xl border-[6px] border-double border-brand bg-[#fffdf7] px-6 py-10 text-center">
+      <article className="rounded-2xl border-[6px] border-double border-brand bg-[#fffdf7] text-stone-900 px-6 py-10 text-center">
         <Award className="mx-auto text-accent" size={52} />
         <p className="mt-3 text-xs font-bold uppercase tracking-[0.25em] text-stone-500">Бира Академия · Сертификат</p>
         <p className="mt-6 text-sm text-stone-500">Удостоверява, че</p>
@@ -58,7 +58,7 @@ export function CertificateScreen({ id }: { id: string }) {
         <button
           type="button"
           onClick={() => print()}
-          className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand py-3.5 font-extrabold text-white hover:bg-brand-hover"
+          className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand py-3.5 font-extrabold text-white hover:bg-brand/80"
         >
           <Printer size={18} /> PDF / Печат
         </button>
@@ -66,7 +66,7 @@ export function CertificateScreen({ id }: { id: string }) {
           <button
             type="button"
             onClick={() => navigator.share({ title: "Бира Академия", text }).catch(() => {})}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-accent py-3.5 font-extrabold text-white hover:bg-accent-dark"
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-accent py-3.5 font-extrabold text-on-accent hover:bg-accent-hover"
           >
             <Share2 size={18} /> Сподели
           </button>

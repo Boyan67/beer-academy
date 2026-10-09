@@ -42,10 +42,10 @@ export function Profile() {
     <div className="space-y-5 p-4 pt-[max(16px,env(safe-area-inset-top))]">
       <h1 className="text-2xl font-extrabold">Профил</h1>
 
-      <label className="block rounded-2xl bg-white p-4">
-        <span className="text-sm font-bold text-stone-600">Име (за сертификатите)</span>
+      <label className="block rounded-2xl bg-surface p-4">
+        <span className="text-sm font-bold text-muted">Име (за сертификатите)</span>
         <input
-          className="mt-2 w-full rounded-lg border border-stone-300 px-3 py-2"
+          className="mt-2 w-full rounded-lg bg-raised border border-line px-3 py-2"
           key={s.name}
           defaultValue={s.name}
           placeholder="Име и фамилия"
@@ -53,20 +53,20 @@ export function Profile() {
         />
       </label>
 
-      <section className="rounded-2xl bg-white p-4">
+      <section className="rounded-2xl bg-surface p-4">
         <div className="flex items-baseline justify-between">
           <h2 className="text-lg font-extrabold">{level.name}</h2>
-          <span className="text-sm font-bold tabular-nums text-stone-500">{s.xp} XP</span>
+          <span className="text-sm font-bold tabular-nums text-muted">{s.xp} XP</span>
         </div>
-        <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-stone-100">
+        <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-raised">
           <div className="h-full rounded-full bg-accent" style={{ width: `${level.progress * 100}%` }} />
         </div>
-        <p className="mt-1.5 text-sm text-stone-500">
+        <p className="mt-1.5 text-sm text-muted">
           {level.next ? `${level.toNext} XP до ${level.next}` : "Достигна върха!"} · Ниво {level.index + 1} от {LEVELS.length}
         </p>
       </section>
 
-      <section className="rounded-2xl bg-white p-4">
+      <section className="rounded-2xl bg-surface p-4">
         <div className="flex items-center gap-2">
           <Flame className="text-accent" fill="currentColor" size={22} />
           <h2 className="text-lg font-extrabold">
@@ -78,9 +78,9 @@ export function Profile() {
             const hit = (s.xpByDay[dayKey(d)] ?? 0) >= s.dailyGoal;
             return (
               <div key={dayKey(d)}>
-                <div className="text-xs font-bold uppercase text-stone-500">{d.toLocaleDateString("bg-BG", { weekday: "narrow" })}</div>
+                <div className="text-xs font-bold uppercase text-muted">{d.toLocaleDateString("bg-BG", { weekday: "narrow" })}</div>
                 <div
-                  className={`mx-auto mt-1 flex h-9 w-9 items-center justify-center rounded-full ${hit ? "bg-accent text-white" : "bg-stone-100 text-stone-300"}`}
+                  className={`mx-auto mt-1 flex h-9 w-9 items-center justify-center rounded-full ${hit ? "bg-accent text-on-accent" : "bg-raised text-muted/50"}`}
                 >
                   <Flame size={16} fill={hit ? "currentColor" : "none"} />
                 </div>
@@ -90,7 +90,7 @@ export function Profile() {
         </div>
       </section>
 
-      <fieldset className="rounded-2xl bg-white p-4">
+      <fieldset className="rounded-2xl bg-surface p-4">
         <legend className="sr-only">Дневна цел</legend>
         <h2 className="mb-3 text-lg font-extrabold">Дневна цел</h2>
         <div className="grid grid-cols-3 gap-2">
@@ -100,44 +100,44 @@ export function Profile() {
               type="button"
               aria-pressed={s.dailyGoal === g.xp}
               onClick={() => s.set({ dailyGoal: g.xp })}
-              className={`rounded-xl border-2 p-2.5 ${s.dailyGoal === g.xp ? "border-brand bg-brand/5" : "border-stone-200"}`}
+              className={`rounded-xl border-2 p-2.5 ${s.dailyGoal === g.xp ? "border-accent bg-accent/10" : "border-line"}`}
             >
               <div className="font-bold">{g.label}</div>
-              <div className="text-sm tabular-nums text-stone-500">{g.xp} XP</div>
-              <div className="text-xs text-stone-400">{g.hint}</div>
+              <div className="text-sm tabular-nums text-muted">{g.xp} XP</div>
+              <div className="text-xs text-muted">{g.hint}</div>
             </button>
           ))}
         </div>
       </fieldset>
 
       {COURSES.some((c) => s.certificates[c.id]) && (
-        <section className="rounded-2xl bg-white p-4">
+        <section className="rounded-2xl bg-surface p-4">
           <h2 className="mb-2 text-lg font-extrabold">Сертификати</h2>
           {COURSES.filter((c) => s.certificates[c.id]).map((c) => (
             <button
               key={c.id}
               type="button"
               onClick={() => go(`#/cert/${c.id}`)}
-              className="flex w-full items-center gap-2 rounded-lg py-2 text-left font-semibold hover:bg-stone-50"
+              className="flex w-full items-center gap-2 rounded-lg py-2 text-left font-semibold hover:bg-raised"
             >
               <Award className="text-accent" size={20} /> {c.title}
-              <span className="ml-auto text-sm text-stone-500">{Math.round(s.certificates[c.id].score * 100)}%</span>
+              <span className="ml-auto text-sm text-muted">{Math.round(s.certificates[c.id].score * 100)}%</span>
             </button>
           ))}
         </section>
       )}
 
-      <section className="space-y-2 rounded-2xl bg-white p-4">
+      <section className="space-y-2 rounded-2xl bg-surface p-4">
         <h2 className="text-lg font-extrabold">Резервно копие</h2>
-        <p className="text-sm text-stone-500">Прогресът се пази само на това устройство. Свали копие, за да го пренесеш или да не го загубиш.</p>
+        <p className="text-sm text-muted">Прогресът се пази само на това устройство. Свали копие, за да го пренесеш или да не го загубиш.</p>
         <div className="flex gap-2">
-          <button type="button" onClick={download} className="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-stone-200 py-2.5 font-bold hover:border-stone-300">
+          <button type="button" onClick={download} className="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-line py-2.5 font-bold hover:border-muted">
             <Download size={18} /> Свали
           </button>
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-stone-200 py-2.5 font-bold hover:border-stone-300"
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-line py-2.5 font-bold hover:border-muted"
           >
             <Upload size={18} /> Възстанови
           </button>
@@ -146,7 +146,7 @@ export function Profile() {
         <button
           type="button"
           onClick={() => confirm("Изтриване на целия прогрес? Това не може да се върне.") && s.reset()}
-          className="flex items-center gap-1.5 pt-2 text-sm font-semibold text-rose-600 hover:underline"
+          className="flex items-center gap-1.5 pt-2 text-sm font-semibold text-bad hover:underline"
         >
           <RotateCcw size={14} /> Изтрий прогреса
         </button>

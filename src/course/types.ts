@@ -46,6 +46,8 @@ export type Step = { card: Card } | { question: Question };
 export type Lesson = {
   id: string;
   title: string;
+  /** One line under the title on the lesson overview. */
+  description: string;
   /** Glass + colour on the lesson node. */
   visual?: Visual;
   /** Built fresh on every start, so retries shuffle. */

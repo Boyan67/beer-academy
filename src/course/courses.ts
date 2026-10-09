@@ -3,7 +3,7 @@ import { handwritten } from "@/course/handwritten";
 import { sample, shuffle, styleQuestions } from "@/course/questions";
 import type { Course, Lesson, Question, Step, StylePart } from "@/course/types";
 import { getStyleBySlug } from "@/lib/beer-guide/styles";
-import { ClipboardCheck } from "lucide-react";
+import { XP } from "@/progress";
 
 const part = (slug: string, p: StylePart): Step => ({ card: { kind: "style", slug, part: p } });
 const ask = (q: Question): Step => ({ question: q });
@@ -17,6 +17,7 @@ function styleLesson(slug: string): Lesson {
   return {
     id: `style:${slug}`,
     title: style.name,
+    description: style.summary,
     visual: { glass: style.glass ?? "tumbler", ebc: style.stats.ebc },
     pool,
     steps: () => {
@@ -36,6 +37,7 @@ function styleLesson(slug: string): Lesson {
         ...pickOne("aroma"),
         part(slug, "malts"),
         part(slug, "hops"),
+        ...pickOne("serve"),
         ...pickOne("malt", "dryhop"),
         part(slug, "yeast"),
         part(slug, "traits"),
@@ -102,18 +104,16 @@ export const PASS_SCORE = 0.8;
 /** Twenty random questions from across the whole course. */
 export const testQuestions = (c: Course) => sample(courseLessons(c).flatMap((l) => l.pool()), TEST_SIZE);
 
-/** All the theory first, then the quiz — with a breather card between the two. */
-export function learnThenQuiz(steps: Step[]): Step[] {
-  const cards = steps.filter((s) => "card" in s);
-  const questions = steps.filter((s) => "question" in s);
-  if (!cards.length || !questions.length) return steps;
-  const intermission: Step = {
-    card: {
-      kind: "text",
-      title: "Време за проверка",
-      body: `Следват ${questions.length} въпроса върху това, което току-що научи. Грешните ще се върнат в Преговор.`,
-      icon: ClipboardCheck,
-    },
+/** Uxcel-style: read everything first, then a separate quiz. */
+export function splitLesson(steps: Step[]) {
+  return {
+    cards: steps.flatMap((s) => ("card" in s ? [s.card] : [])),
+    questions: steps.flatMap((s) => ("question" in s ? [s.question] : [])),
   };
-  return [...cards, intermission, ...questions];
 }
+
+/** XP for a clean run — shown on the "Към теста" button. */
+export const lessonXp = (questions: number) => questions * XP.correct + XP.lesson + XP.perfect;
+
+/** Roughly 40 seconds a section — good enough for a "~ N мин" label. */
+export const readMinutes = (sections: number) => Math.max(2, Math.round(sections * 0.7));

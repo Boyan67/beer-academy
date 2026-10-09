@@ -18,8 +18,8 @@ export default defineConfig({
         short_name: "Бира Академия",
         description: "Научи бирените стилове — урок по урок.",
         lang: "bg",
-        theme_color: "#233329",
-        background_color: "#f5f5f4",
+        theme_color: "#1d1e25",
+        background_color: "#1d1e25",
         display: "standalone",
         start_url: "/",
         icons: [

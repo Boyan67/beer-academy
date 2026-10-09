@@ -1,12 +1,10 @@
 import { useId } from "react";
-import { Landmark, Microscope, Thermometer } from "lucide-react";
+import { Landmark, Lightbulb, Thermometer, type LucideIcon } from "lucide-react";
 
 import BeerGlass from "@/components/beer-guide/BeerGlass";
 import HopBreakdown from "@/components/beer-guide/HopBreakdown";
 import MaltBreakdown from "@/components/beer-guide/MaltBreakdown";
-import Section from "@/components/beer-guide/Section";
 import SensoryProfile from "@/components/beer-guide/SensoryProfile";
-import StyleFact from "@/components/beer-guide/StyleFact";
 import StyleRadar from "@/components/beer-guide/StyleRadar";
 import type { Card, Visual } from "@/course/types";
 import { METRIC_LIST, formatRange } from "@/lib/beer-guide/metrics";
@@ -14,110 +12,190 @@ import { FAMILIES, getStyleBySlug } from "@/lib/beer-guide/styles";
 
 export function VisualView({ v, className = "h-36" }: { v: Visual; className?: string }) {
   const id = useId().replace(/:/g, "");
-  if (v.img) return <img src={v.img} alt="" className={`${className} aspect-square rounded-full object-cover ring-1 ring-black/5`} />;
+  if (v.img) return <img src={v.img} alt="" className={`${className} aspect-square rounded-full object-cover`} />;
   if (v.glass) return <BeerGlass id={id} shape={v.glass} ebc={v.ebc ?? [8, 12]} className={className} />;
   return null;
 }
 
-export function CardView({ card }: { card: Card }) {
-  if (card.kind === "text") {
-    const Icon = card.icon;
-    return (
-      <div className="flex flex-col items-center gap-5 pt-4 text-center">
-        {card.visual ? (
-          <VisualView v={card.visual} className="h-44" />
-        ) : (
-          Icon && (
-            <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand/10 text-brand">
-              <Icon size={30} />
-            </span>
-          )
-        )}
-        <h2 className="text-2xl font-extrabold leading-tight">{card.title}</h2>
-        <p className="text-[17px] leading-relaxed text-stone-700">{card.body}</p>
+/**
+ * Uxcel's illustration frame: a raised border around a coloured panel. `brand`
+ * is the dark green the glasses sit on; `paper` hosts the light guide widgets.
+ */
+export function Figure({ tone = "brand", children }: { tone?: "brand" | "paper"; children: React.ReactNode }) {
+  return (
+    <div className="rounded-2xl bg-raised p-2">
+      <div
+        className={`flex min-h-48 flex-col items-center justify-center rounded-xl p-5 ${
+          tone === "brand" ? "bg-brand" : "bg-white text-stone-900"
+        }`}
+      >
+        {children}
       </div>
-    );
-  }
-  return <StylePartView slug={card.slug} part={card.part} />;
+    </div>
+  );
 }
 
-function StylePartView({ slug, part }: { slug: string; part: Extract<Card, { kind: "style" }>["part"] }) {
-  const s = getStyleBySlug(slug)!;
-  switch (part) {
+const IconArt = ({ icon: Icon }: { icon: LucideIcon }) => <Icon size={72} strokeWidth={1.5} className="text-accent" />;
+
+type Section = { title: string; figure?: React.ReactNode; body?: React.ReactNode };
+
+/** One reading section — what Uxcel calls an exercise. */
+export function Exercise({ card, n }: { card: Card; n: number }) {
+  const { title, figure, body } = section(card);
+  return (
+    <section className="space-y-5">
+      <div>
+        <p className="text-sm font-bold uppercase tracking-wider text-muted">Част #{n}</p>
+        <h2 className="mt-1 text-2xl font-extrabold leading-tight">{title}</h2>
+      </div>
+      {figure}
+      {body && <div className="space-y-4 text-[17px] leading-relaxed text-ink/85">{body}</div>}
+    </section>
+  );
+}
+
+function section(card: Card): Section {
+  if (card.kind === "text") {
+    return {
+      title: card.title,
+      figure: card.visual ? (
+        <Figure tone={card.visual.img ? "paper" : "brand"}>
+          <VisualView v={card.visual} className="h-40" />
+        </Figure>
+      ) : card.icon ? (
+        <Figure>
+          <IconArt icon={card.icon} />
+        </Figure>
+      ) : undefined,
+      body: <p>{card.body}</p>,
+    };
+  }
+
+  const s = getStyleBySlug(card.slug)!;
+  switch (card.part) {
     case "intro":
-      return (
-        <div className="flex flex-col items-center gap-4 pt-2 text-center">
-          <BeerGlass id={`intro-${slug}`} shape={s.glass} ebc={s.stats.ebc} className="h-48" />
-          <div className="flex gap-2 text-xs font-bold uppercase tracking-wider text-stone-500">
-            <span className="rounded-full bg-white px-2.5 py-1">BJCP {s.code}</span>
-            <span className="rounded-full bg-white px-2.5 py-1">{FAMILIES[s.family].short}</span>
-          </div>
-          <h2 className="text-3xl font-extrabold leading-tight">{s.name}</h2>
-          <p className="text-[17px] leading-relaxed text-stone-700">{s.summary}</p>
-        </div>
-      );
+      return {
+        title: `Какво е ${s.name}?`,
+        figure: (
+          <Figure>
+            <BeerGlass id={`intro-${s.slug}`} shape={s.glass} ebc={s.stats.ebc} className="h-44" />
+            <div className="mt-4 flex gap-2 text-xs font-bold uppercase tracking-wider text-white/80">
+              <span className="rounded-full bg-white/10 px-2.5 py-1">BJCP {s.code}</span>
+              <span className="rounded-full bg-white/10 px-2.5 py-1">{FAMILIES[s.family].short}</span>
+            </div>
+          </Figure>
+        ),
+        body: <p>{s.summary}</p>,
+      };
     case "stats":
-      return (
-        <div className="space-y-4">
-          <h2 className="text-center text-xl font-extrabold">Числата на {s.name}</h2>
-          <StyleRadar stats={s.stats} className="mx-auto w-full max-w-[320px]" />
+      return {
+        title: "Числата",
+        figure: (
+          <Figure tone="paper">
+            <StyleRadar stats={s.stats} className="w-full max-w-[300px]" />
+          </Figure>
+        ),
+        body: (
           <dl className="grid grid-cols-2 gap-2">
             {METRIC_LIST.map((m) => (
-              <div key={m.key} className="rounded-xl bg-white p-3">
-                <dt className="text-[11px] font-bold uppercase tracking-wider" style={{ color: m.color }}>
+              <div key={m.key} className="rounded-xl bg-surface p-3">
+                <dt className="text-[11px] font-bold uppercase tracking-wider text-muted">
                   {m.label} · {m.name}
                 </dt>
-                <dd className="mt-0.5 text-lg font-extrabold tabular-nums">{formatRange(s.stats[m.key], m)}</dd>
+                <dd className="mt-0.5 text-lg font-extrabold tabular-nums text-ink">{formatRange(s.stats[m.key], m)}</dd>
               </div>
             ))}
           </dl>
-        </div>
-      );
+        ),
+      };
     case "sensory":
-      return <SensoryProfile sensory={s.sensory} />;
+      return {
+        title: "Вкусов профил",
+        figure: (
+          <Figure tone="paper">
+            <div className="w-full">
+              <SensoryProfile sensory={s.sensory} />
+            </div>
+          </Figure>
+        ),
+        body: <p>Гледаш, мирисаш, пиеш — в този ред съдиите описват {s.name}.</p>,
+      };
     case "malts":
-      return <MaltBreakdown malts={s.malts} text={s.malt} />;
+      return {
+        title: "Малцът",
+        figure: (
+          <Figure tone="paper">
+            <div className="w-full">
+              <MaltBreakdown malts={s.malts} text={s.malt} />
+            </div>
+          </Figure>
+        ),
+        body: <p>{s.malt}</p>,
+      };
     case "hops":
-      return <HopBreakdown schedule={s.hopSchedule} text={s.hops} />;
+      return {
+        title: "Хмелът",
+        figure: (
+          <Figure tone="paper">
+            <div className="w-full">
+              <HopBreakdown schedule={s.hopSchedule} text={s.hops} />
+            </div>
+          </Figure>
+        ),
+        body: <p>{s.hops}</p>,
+      };
     case "yeast":
-      return (
-        <Section icon={Microscope} title="Мая и ферментация" accent="#7c3aed">
-          <p className="text-[15px] leading-relaxed text-stone-700">{s.yeast}</p>
-          <div className="mt-4 flex items-center gap-3 rounded-xl bg-stone-50 p-3">
-            <Thermometer className="shrink-0 text-accent" size={22} />
+      return {
+        title: "Мая и ферментация",
+        figure: (
+          <Figure>
+            <Thermometer size={56} strokeWidth={1.5} className="text-accent" />
+            <p className="mt-3 text-4xl font-extrabold tabular-nums text-white">
+              {s.fermentation[0]}–{s.fermentation[1]} °C
+            </p>
+          </Figure>
+        ),
+        body: (
+          <>
+            <p>{s.yeast}</p>
+            <p>{s.fermentationNote}</p>
+          </>
+        ),
+      };
+    case "traits":
+      return {
+        title: `Какво отличава ${s.name}`,
+        body: s.traits.map(({ icon: Icon, title, text }) => (
+          <div key={title} className="flex gap-3 rounded-2xl bg-surface p-4">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand text-accent">
+              <Icon size={22} />
+            </span>
             <div>
-              <div className="text-lg font-extrabold tabular-nums">
-                {s.fermentation[0]}–{s.fermentation[1]} °C
-              </div>
-              <p className="text-[13px] leading-snug text-stone-600">{s.fermentationNote}</p>
+              <h3 className="font-bold text-ink">{title}</h3>
+              <p className="text-[15px] leading-relaxed text-muted">{text}</p>
             </div>
           </div>
-        </Section>
-      );
-    case "traits":
-      return (
-        <div className="space-y-3">
-          <h2 className="text-center text-xl font-extrabold">Какво отличава {s.name}</h2>
-          {s.traits.map(({ icon: Icon, title, text }) => (
-            <div key={title} className="flex gap-3 rounded-xl border border-stone-200 bg-white p-4">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
-                <Icon size={20} />
-              </span>
-              <div>
-                <h3 className="font-bold">{title}</h3>
-                <p className="text-[15px] leading-relaxed text-stone-700">{text}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      );
+        )),
+      };
     case "history":
-      return (
-        <Section icon={Landmark} title="История" accent="#0e7490">
-          <p className="text-[15px] leading-relaxed text-stone-700">{s.history}</p>
-        </Section>
-      );
+      return {
+        title: "История",
+        figure: (
+          <Figure>
+            <IconArt icon={Landmark} />
+          </Figure>
+        ),
+        body: <p>{s.history}</p>,
+      };
     case "fact":
-      return <StyleFact fact={s.fact} />;
+      return {
+        title: "Интересен факт",
+        body: (
+          <div className="flex gap-3 rounded-2xl border border-accent/40 bg-accent/10 p-4">
+            <Lightbulb className="shrink-0 text-accent" />
+            <p>{s.fact}</p>
+          </div>
+        ),
+      };
   }
 }

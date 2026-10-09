@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { COURSES, courseLessons, learnThenQuiz } from "@/course/courses";
+import { COURSES, courseLessons, splitLesson } from "@/course/courses";
 import { checkAnswer } from "@/course/questions";
 import type { Question } from "@/course/types";
 import { BEER_STYLES } from "@/lib/beer-guide/styles";
@@ -36,10 +36,11 @@ describe("content", () => {
   });
 });
 
-it("lessons teach first, quiz after", () => {
+it("every lesson has reading and a quiz", () => {
   for (const l of lessons) {
-    const kinds = learnThenQuiz(l.steps()).map((s) => ("card" in s ? "c" : "q")).join("");
-    expect(kinds, l.id).toMatch(/^c+q+$/);
+    const { cards, questions } = splitLesson(l.steps());
+    expect(cards.length, l.id).toBeGreaterThanOrEqual(4);
+    expect(questions.length, l.id).toBeGreaterThanOrEqual(4);
   }
 });
 

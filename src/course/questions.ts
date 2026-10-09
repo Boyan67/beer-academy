@@ -1,6 +1,6 @@
 import { BEER_STYLES, FAMILIES } from "@/lib/beer-guide/styles";
 import { METRICS, formatRange, midpoint } from "@/lib/beer-guide/metrics";
-import type { BeerStyle, Range } from "@/lib/beer-guide/types";
+import type { BeerStyle, GlassShape, Range } from "@/lib/beer-guide/types";
 import type { Answer, Option, Question } from "@/course/types";
 
 export function shuffle<T>(items: readonly T[]): T[] {
@@ -36,8 +36,8 @@ export function trueFalse(id: string, prompt: string, isTrue: boolean, explain: 
 }
 
 /** Hand-written choice: `options[0]` is the right one. */
-export function choiceFirstRight(id: string, prompt: string, options: string[], explain: string, visual?: Question["visual"]): Question {
-  const [right, ...wrong] = options.map((label) => ({ label }));
+export function choiceFirstRight(id: string, prompt: string, options: (string | Option)[], explain: string, visual?: Question["visual"]): Question {
+  const [right, ...wrong] = options.map((o) => (typeof o === "string" ? { label: o } : o));
   return choice({ id, prompt, explain, visual }, right, wrong);
 }
 
@@ -79,6 +79,17 @@ export function baseMalt(name: string): string {
   if (/munich/i.test(name)) return "Мюнхенски малц";
   return name;
 }
+export const GLASS_NAMES: Record<GlassShape, string> = {
+  tumbler: "Шейкър",
+  weizen: "Вайцен",
+  pilsner: "Пилзнер",
+  stange: "Щанге",
+  pint: "Пинта",
+  tulip: "Лале",
+  mug: "Халба",
+  footed: "Бокал",
+};
+
 const BASE_MALTS = ["Пилзнер малц", "Пейл ейл малц", "Пшеничен малц", "Виенски малц", "Мюнхенски малц", "Опушен малц (Rauchmalz)"];
 
 /** Every generated question for one style. Lessons pick from it; tests use all. */
@@ -109,6 +120,16 @@ export function styleQuestions(s: BeerStyle): Question[] {
       others(s, distinct)
         .slice(0, 3)
         .map((o) => ({ label: o.name })),
+    ),
+  );
+
+  // Picture answers: four glasses filled with this style's colour.
+  const glassOption = (shape: GlassShape) => ({ label: GLASS_NAMES[shape], visual: { glass: shape, ebc: s.stats.ebc } });
+  qs.push(
+    choice(
+      { id: id("serve"), prompt: `В коя чаша традиционно се сервира ${s.name}?`, explain: `${s.name} се налива в чаша ${GLASS_NAMES[glass]}.` },
+      glassOption(glass),
+      sample((Object.keys(GLASS_NAMES) as GlassShape[]).filter((g) => g !== glass), 3).map(glassOption),
     ),
   );
 
