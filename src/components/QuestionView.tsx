@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Check, X } from "lucide-react";
 
-import { VisualView } from "@/components/Cards";
-import type { Answer, Question } from "@/course/types";
+import { Figure, VisualView, figureTone } from "@/components/Cards";
+import type { Answer, Option, Question } from "@/course/types";
 
 type Props<K extends Question["kind"]> = {
   q: Extract<Question, { kind: K }>;
@@ -14,14 +14,14 @@ type Props<K extends Question["kind"]> = {
 
 export default function QuestionView({ q, ...rest }: Omit<Props<Question["kind"]>, "q"> & { q: Question }) {
   return (
-    <div className="space-y-5">
-      <h2 className="whitespace-pre-line text-xl font-extrabold leading-snug">{q.prompt}</h2>
+    <div className="space-y-6">
       {q.visual && (
-        <div className="flex justify-center">
+        <Figure tone={figureTone(q.visual)}>
           <VisualView v={q.visual} className="h-40" />
-        </div>
+        </Figure>
       )}
-      {q.kind === "choice" && (q.options.every((o) => o.visual) ? <Pictures q={q} {...rest} /> : <Choice q={q} {...rest} />)}
+      <h2 className="whitespace-pre-line text-xl font-bold leading-snug">{q.prompt}</h2>
+      {q.kind === "choice" && <Choice q={q} {...rest} />}
       {q.kind === "multi" && <Multi q={q} {...rest} />}
       {q.kind === "order" && <Order q={q} {...rest} />}
       {q.kind === "slider" && <Slider q={q} {...rest} />}
@@ -30,54 +30,80 @@ export default function QuestionView({ q, ...rest }: Omit<Props<Question["kind"]
   );
 }
 
+type Tone = "right" | "wrong" | undefined;
+
+const ring = (selected: boolean, state: Tone) =>
+  state === "right"
+    ? "border-good bg-good/10"
+    : state === "wrong"
+      ? "border-bad bg-bad/10"
+      : selected
+        ? "border-accent bg-accent/10"
+        : "border-line hover:border-muted/60";
+
 function OptionButton({
-  label,
+  option,
   selected,
   state,
-  disabled,
+  revealed,
   onClick,
   marker,
 }: {
-  label: string;
+  option: Option;
   selected: boolean;
-  state?: "right" | "wrong";
-  disabled: boolean;
+  state: Tone;
+  revealed: boolean;
   onClick: () => void;
   marker?: React.ReactNode;
 }) {
-  const tone =
-    state === "right"
-      ? "border-emerald-500 bg-emerald-50"
-      : state === "wrong"
-        ? "border-rose-500 bg-rose-50"
-        : selected
-          ? "border-brand bg-brand/5"
-          : "border-stone-200 bg-white hover:border-stone-300";
+  // Picture answers: the label would give it away, so it only shows once checked.
+  if (option.visual) {
+    return (
+      <button
+        type="button"
+        disabled={revealed}
+        onClick={onClick}
+        aria-pressed={selected}
+        aria-label={revealed ? option.label : undefined}
+        className={`relative flex flex-col items-center gap-2 rounded-2xl border-2 p-2 transition-colors ${ring(selected, state)}`}
+      >
+        <span className={`flex h-36 w-full items-center justify-center rounded-xl ${option.visual.img ? "bg-white" : "bg-brand"}`}>
+          <VisualView v={option.visual} className={option.visual.tall ? "h-32" : "h-28"} />
+        </span>
+        {revealed && <span className="pb-1 text-sm font-bold">{option.label}</span>}
+        {state && <StateIcon state={state} className="absolute right-3 top-3" />}
+      </button>
+    );
+  }
   return (
     <button
       type="button"
-      disabled={disabled}
+      disabled={revealed}
       onClick={onClick}
       aria-pressed={selected}
-      className={`flex w-full items-center gap-3 rounded-xl border-2 px-4 py-3.5 text-left text-[16px] font-semibold transition-colors ${tone}`}
+      className={`flex w-full items-center gap-3 rounded-2xl border-2 px-5 py-5 text-left text-[17px] transition-colors ${ring(selected, state)}`}
     >
       {marker}
-      <span className="flex-1">{label}</span>
-      {state === "right" && <Check className="text-emerald-600" size={20} />}
-      {state === "wrong" && <X className="text-rose-600" size={20} />}
+      <span className="flex-1">{option.label}</span>
+      {state && <StateIcon state={state} />}
     </button>
   );
 }
 
+const StateIcon = ({ state, className = "" }: { state: "right" | "wrong"; className?: string }) =>
+  state === "right" ? <Check className={`text-good ${className}`} size={20} /> : <X className={`text-bad ${className}`} size={20} />;
+
+const layout = (options: Option[]) => (options.some((o) => o.visual) ? "grid grid-cols-2 gap-3" : "space-y-3");
+
 function Choice({ q, answer, onAnswer, revealed }: Props<"choice">) {
   return (
-    <div className="space-y-2.5" role="radiogroup">
+    <div className={layout(q.options)} role="radiogroup">
       {q.options.map((o, i) => (
         <OptionButton
           key={o.label}
-          label={o.label}
+          option={o}
           selected={answer === i}
-          disabled={revealed}
+          revealed={revealed}
           state={revealed ? (i === q.answer ? "right" : answer === i ? "wrong" : undefined) : undefined}
           onClick={() => onAnswer(i)}
         />
@@ -86,61 +112,24 @@ function Choice({ q, answer, onAnswer, revealed }: Props<"choice">) {
   );
 }
 
-/** Picture options in a 2×2 grid; the names appear once the answer is checked. */
-function Pictures({ q, answer, onAnswer, revealed }: Props<"choice">) {
-  return (
-    <div className="grid grid-cols-2 gap-2.5" role="radiogroup">
-      {q.options.map((o, i) => {
-        const state = revealed ? (i === q.answer ? "right" : answer === i ? "wrong" : undefined) : undefined;
-        const tone =
-          state === "right"
-            ? "border-emerald-500 bg-emerald-50"
-            : state === "wrong"
-              ? "border-rose-500 bg-rose-50"
-              : answer === i
-                ? "border-brand bg-brand/5"
-                : "border-stone-200 bg-white";
-        return (
-          <button
-            key={o.label}
-            type="button"
-            disabled={revealed}
-            onClick={() => onAnswer(i)}
-            role="radio"
-            aria-checked={answer === i}
-            aria-label={o.label}
-            className={`relative flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 p-3 transition-colors ${tone}`}
-          >
-            <VisualView v={o.visual!} className={o.visual!.tall ? "h-40" : "h-28"} />
-            {revealed && <span className="text-center text-sm font-bold leading-tight">{o.label}</span>}
-            {state === "right" && <Check className="absolute right-2 top-2 text-emerald-600" size={20} />}
-            {state === "wrong" && <X className="absolute right-2 top-2 text-rose-600" size={20} />}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
 function Multi({ q, answer, onAnswer, revealed }: Props<"multi">) {
   const picked = (answer as number[] | undefined) ?? [];
   const toggle = (i: number) => onAnswer(picked.includes(i) ? picked.filter((p) => p !== i) : [...picked, i]);
   return (
-    <div className="space-y-2.5">
+    <div className={layout(q.options)}>
       {q.options.map((o, i) => {
         const isPicked = picked.includes(i);
-        const isRight = q.answer.includes(i);
         return (
           <OptionButton
             key={o.label}
-            label={o.label}
+            option={o}
             selected={isPicked}
-            disabled={revealed}
-            state={revealed ? (isRight ? "right" : isPicked ? "wrong" : undefined) : undefined}
+            revealed={revealed}
+            state={revealed ? (q.answer.includes(i) ? "right" : isPicked ? "wrong" : undefined) : undefined}
             onClick={() => toggle(i)}
             marker={
               <span
-                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 ${isPicked ? "border-brand bg-brand text-white" : "border-stone-300"}`}
+                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 ${isPicked ? "border-accent bg-accent text-on-accent" : "border-muted/50"}`}
               >
                 {isPicked && <Check size={14} strokeWidth={3} />}
               </span>
@@ -158,25 +147,24 @@ function Order({ q, answer, onAnswer, revealed }: Props<"order">) {
   const left = q.items.map((_, i) => i).filter((i) => !placed.includes(i));
   return (
     <div className="space-y-4">
-      <ol className="space-y-2">
+      <ol className="space-y-2.5">
         {q.items.map((_, slot) => {
           const item = placed[slot];
-          const state = revealed ? (item === q.answer[slot] ? "right" : "wrong") : undefined;
           return (
             <li key={slot}>
               <OptionButton
-                label={item === undefined ? "…" : q.items[item]}
+                option={{ label: item === undefined ? "…" : q.items[item] }}
                 selected={item !== undefined}
-                state={state}
-                disabled={revealed || item === undefined}
+                state={revealed ? (item === q.answer[slot] ? "right" : "wrong") : undefined}
+                revealed={revealed || item === undefined}
                 onClick={() => onAnswer(placed.filter((p) => p !== item))}
-                marker={<span className="w-5 text-center font-extrabold text-stone-400">{slot + 1}</span>}
+                marker={<span className="w-5 text-center font-extrabold text-muted">{slot + 1}</span>}
               />
             </li>
           );
         })}
       </ol>
-      <div className="flex justify-between px-1 text-xs font-bold uppercase tracking-wider text-stone-500">
+      <div className="flex justify-between px-1 text-xs font-bold uppercase tracking-wider text-muted">
         <span>1 = {q.hint[0]}</span>
         <span>
           {q.items.length} = {q.hint[1]}
@@ -189,7 +177,7 @@ function Order({ q, answer, onAnswer, revealed }: Props<"order">) {
               key={i}
               type="button"
               onClick={() => onAnswer([...placed, i])}
-              className="rounded-full border-2 border-stone-200 bg-white px-4 py-2 font-semibold hover:border-brand"
+              className="rounded-full border-2 border-line bg-surface px-4 py-2 font-semibold hover:border-accent"
             >
               {q.items[i]}
             </button>
@@ -221,34 +209,32 @@ function Match({ q, answer, onAnswer, revealed }: Props<"match">) {
 
   return (
     <div className="space-y-4">
-      <ul className="space-y-2">
+      <ul className="space-y-2.5">
         {q.left.map((label, slot) => {
           const item = slots[slot];
           const right = item === q.answer[slot];
           const tone = revealed
-            ? right
-              ? "border-emerald-500 bg-emerald-50"
-              : "border-rose-500 bg-rose-50"
+            ? ring(true, right ? "right" : "wrong")
             : item !== -1
-              ? "border-brand bg-brand/5"
+              ? ring(true, undefined)
               : slot === active
-                ? "border-accent border-dashed bg-white"
-                : "border-stone-200 border-dashed bg-white";
+                ? "border-dashed border-accent"
+                : "border-dashed border-line";
           return (
-            <li key={label} className="grid grid-cols-2 items-stretch gap-2">
-              <span className="flex items-center rounded-xl bg-stone-200/60 px-3 py-3 text-[15px] font-bold leading-snug">{label}</span>
+            <li key={label} className="grid grid-cols-2 items-stretch gap-2.5">
+              <span className="flex items-center rounded-2xl bg-surface px-4 py-3 font-bold leading-snug">{label}</span>
               <button
                 type="button"
                 disabled={revealed}
                 onClick={() => tap(slot)}
                 aria-label={`${label}: ${item === -1 ? "празно" : q.right[item]}`}
-                className={`flex items-center gap-1.5 rounded-xl border-2 px-3 py-2 text-left text-[15px] font-semibold leading-snug transition-colors ${tone}`}
+                className={`flex items-center gap-1.5 rounded-2xl border-2 px-4 py-3 text-left leading-snug transition-colors ${tone}`}
               >
                 <span className="flex-1">
-                  {item === -1 ? <span className="text-stone-400">…</span> : q.right[item]}
-                  {revealed && !right && <span className="block text-[13px] font-bold text-emerald-700">→ {q.right[q.answer[slot]]}</span>}
+                  {item === -1 ? <span className="text-muted">…</span> : q.right[item]}
+                  {revealed && !right && <span className="block text-[13px] font-bold text-good">→ {q.right[q.answer[slot]]}</span>}
                 </span>
-                {revealed && (right ? <Check className="shrink-0 text-emerald-600" size={18} /> : <X className="shrink-0 text-rose-600" size={18} />)}
+                {revealed && <StateIcon state={right ? "right" : "wrong"} className="shrink-0" />}
               </button>
             </li>
           );
@@ -261,7 +247,7 @@ function Match({ q, answer, onAnswer, revealed }: Props<"match">) {
               key={i}
               type="button"
               onClick={() => place(i)}
-              className="rounded-full border-2 border-stone-200 bg-white px-4 py-2 font-semibold hover:border-brand"
+              className="rounded-full border-2 border-line bg-surface px-4 py-2 font-semibold hover:border-accent"
             >
               {q.right[i]}
             </button>
@@ -279,14 +265,14 @@ function Slider({ q, answer, onAnswer, revealed }: Props<"slider">) {
   const value = (answer as number | undefined) ?? sliderStart(q);
   const pct = (v: number) => ((v - q.min) / (q.max - q.min)) * 100;
   return (
-    <div className="space-y-3 rounded-2xl bg-white p-5">
+    <div className="space-y-3 rounded-2xl border-2 border-line p-5">
       <div className="text-center text-4xl font-extrabold tabular-nums">
-        {value} <span className="text-lg text-stone-500">{q.unit}</span>
+        {value} <span className="text-lg text-muted">{q.unit}</span>
       </div>
       <div className="relative pt-2">
         {revealed && (
           <div
-            className="absolute top-0 h-1.5 rounded-full bg-emerald-500"
+            className="absolute top-0 h-1.5 rounded-full bg-good"
             style={{ left: `${pct(q.answer[0])}%`, width: `${pct(q.answer[1]) - pct(q.answer[0])}%` }}
             title="Верният диапазон"
           />
@@ -303,7 +289,7 @@ function Slider({ q, answer, onAnswer, revealed }: Props<"slider">) {
           className="w-full"
         />
       </div>
-      <div className="flex justify-between text-sm text-stone-500 tabular-nums">
+      <div className="flex justify-between text-sm tabular-nums text-muted">
         <span>{q.min}</span>
         <span>{q.max}</span>
       </div>

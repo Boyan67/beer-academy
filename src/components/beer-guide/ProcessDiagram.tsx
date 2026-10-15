@@ -1,10 +1,8 @@
-import { Thermometer } from "lucide-react";
-
 import { ebcToColor } from "@/lib/beer-guide/metrics";
 import { PROCESS_STEPS } from "@/lib/beer-guide/process";
 
 const STROKE = "#a8a29e";
-const ACCENT = "#cf6911";
+const ACCENT = "#f2a541";
 const MASH = "#d9a95f";
 const GRAIN = "#a97a3c";
 const WORT = ebcToColor(18);
@@ -100,58 +98,45 @@ const LINKS: [number, number][] = [
   [4, 5],
 ];
 
+/** The whole brewing line with one step lit; the reading page puts its text underneath. */
 export default function ProcessDiagram({ step }: { step: number }) {
-  const current = PROCESS_STEPS[step];
   return (
-    <div className="space-y-4">
-      <svg viewBox="0 0 360 262" className="w-full" role="img" aria-label={`Варене на бира, стъпка ${step + 1}: ${current.title}`}>
-        {LINKS.map(([a, b]) => {
-          const [x1, y1] = SPOTS[a];
-          const [x2, y2] = SPOTS[b];
-          const vertical = x1 === x2;
-          return (
-            <line
-              key={a}
-              x1={vertical ? x1 : x1 + (x2 > x1 ? 42 : -42)}
-              y1={vertical ? y1 + 48 : y1 + 10}
-              x2={vertical ? x2 : x2 + (x2 > x1 ? -42 : 42)}
-              y2={vertical ? y2 - 44 : y2 + 10}
-              stroke={b <= step ? ACCENT : "#e7e5e4"}
-              strokeWidth={5}
-              strokeLinecap="round"
-            />
-          );
-        })}
+    <svg viewBox="0 0 360 262" className="w-full" role="img" aria-label={`Варене на бира, стъпка ${step + 1}: ${PROCESS_STEPS[step].title}`}>
+      {LINKS.map(([a, b]) => {
+        const [x1, y1] = SPOTS[a];
+        const [x2, y2] = SPOTS[b];
+        const vertical = x1 === x2;
+        return (
+          <line
+            key={a}
+            x1={vertical ? x1 : x1 + (x2 > x1 ? 42 : -42)}
+            y1={vertical ? y1 + 48 : y1 + 10}
+            x2={vertical ? x2 : x2 + (x2 > x1 ? -42 : 42)}
+            y2={vertical ? y2 - 44 : y2 + 10}
+            stroke={b <= step ? ACCENT : "#e7e5e4"}
+            strokeWidth={5}
+            strokeLinecap="round"
+          />
+        );
+      })}
 
-        {SPOTS.map(([cx, cy], i) => {
-          const active = i === step;
-          return (
-            <g key={i} opacity={i > step ? 0.4 : 1}>
-              {active && <circle cx={cx} cy={cy} r={50} fill={ACCENT} opacity={0.1} />}
-              <g transform={`translate(${cx - 38} ${cy - 42})`}>{VESSELS[i](active)}</g>
-              <text
-                x={cx}
-                y={cy + 58}
-                textAnchor="middle"
-                className={`text-[13px] ${active ? "fill-stone-900 font-extrabold" : "fill-stone-500 font-semibold"}`}
-              >
-                {PROCESS_STEPS[i].title}
-              </text>
-            </g>
-          );
-        })}
-      </svg>
-
-      <div className="space-y-2 text-center">
-        <p className="text-xs font-bold uppercase tracking-wider text-accent">
-          Стъпка {step + 1} от {PROCESS_STEPS.length}
-        </p>
-        <h2 className="text-2xl font-extrabold leading-tight">{current.title}</h2>
-        <span className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-sm font-bold tabular-nums text-stone-700">
-          <Thermometer size={15} className="text-accent" /> {current.temp}
-        </span>
-        <p className="text-[17px] leading-relaxed text-stone-700">{current.body}</p>
-      </div>
-    </div>
+      {SPOTS.map(([cx, cy], i) => {
+        const active = i === step;
+        return (
+          <g key={i} opacity={i > step ? 0.4 : 1}>
+            {active && <circle cx={cx} cy={cy} r={50} fill={ACCENT} opacity={0.12} />}
+            <g transform={`translate(${cx - 38} ${cy - 42})`}>{VESSELS[i](active)}</g>
+            <text
+              x={cx}
+              y={cy + 58}
+              textAnchor="middle"
+              className={`text-[13px] ${active ? "fill-stone-900 font-extrabold" : "fill-stone-500 font-semibold"}`}
+            >
+              {PROCESS_STEPS[i].title}
+            </text>
+          </g>
+        );
+      })}
+    </svg>
   );
 }

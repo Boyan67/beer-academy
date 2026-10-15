@@ -26,17 +26,18 @@ import { PHOTOS } from "@/lib/beer-guide/photos";
 import { PROCESS_STEPS } from "@/lib/beer-guide/process";
 import { SENSORY_ASPECTS } from "@/lib/beer-guide/sensory";
 import type { GlassShape, MaltKey } from "@/lib/beer-guide/types";
-import { match, choiceFirstRight as pick, picturesFirstRight as pictures, shuffle, trueFalse as tf } from "@/course/questions";
+import { match, choiceFirstRight as pick, shuffle, trueFalse as tf } from "@/course/questions";
 import type { Card, Lesson, Question, Step } from "@/course/types";
 
 const card = (c: Omit<Extract<Card, { kind: "text" }>, "kind">): Step => ({ card: { kind: "text", ...c } });
 const ask = (q: Question): Step => ({ question: q });
 
 /** A basics lesson: steps built per start, the pool is every question in it. */
-function lesson(id: string, title: string, visual: Lesson["visual"], build: () => Step[]): Lesson {
+function lesson(id: string, title: string, description: string, visual: Lesson["visual"], build: () => Step[]): Lesson {
   return {
     id: `basics:${id}`,
     title,
+    description,
     visual,
     steps: build,
     pool: () => build().flatMap((s) => ("question" in s ? [s.question] : [])),
@@ -53,7 +54,7 @@ const METRIC_MORE: Record<string, string> = {
   bugu: "Същата горчивина се усеща различно в плътна и в лека бира — BU:GU ги изравнява.",
 };
 
-const numbers = lesson("numbers", "Числата", { glass: "tumbler", ebc: [8, 12] }, () => [
+const numbers = lesson("numbers", "Числата", "Шестте числа, с които се описва всяка бира — от плътност до баланс.", { glass: "tumbler", ebc: [8, 12] }, () => [
   card({
     title: "Шест числа описват всяка бира",
     body: "Плътност преди и след ферментация, горчивина, цвят, алкохол и баланс. С тях можеш да прочетеш един стил още преди да го опиташ.",
@@ -92,7 +93,7 @@ const MALTS: { key: MaltKey; name: string; body: string }[] = [
   { key: "oats", name: "Люспи — овес и ечемик", body: "Не са малцувани. Дават кадифено тяло и мътност — Hazy IPA, Irish Stout." },
 ];
 
-const malts = lesson("malts", "Малцът", { glass: "pint", ebc: [16, 28] }, () => [
+const malts = lesson("malts", "Малцът", "Зърното, което дава захарта, цвета и половината вкус.", { glass: "pint", ebc: [16, 28] }, () => [
   card({
     title: "Малцът е душата на бирата",
     body: "Зърното покълва, после се суши и пече. Колкото по-силно е печено, толкова по-тъмен е цветът и по-силен е вкусът. Малцът дава захарта за алкохола, цвета, тялото и половината вкус.",
@@ -103,19 +104,24 @@ const malts = lesson("malts", "Малцът", { glass: "pint", ebc: [16, 28] }, 
   ask(pick("malts:foam", "Кой малц дава мътност и плътна пяна?", ["Пшеничен", "Пилзнер", "Виенски", "Карамелен"], "Протеините в пшеницата.")),
   ...MALTS.slice(4).map((m) => card({ title: m.name, body: m.body, visual: { img: MALT_IMAGES[m.key] } })),
   ask(pick("malts:img2", "Кой малц е това?", ["Печен ечемик", "Пилзнер малц", "Пейл ейл малц", "Пшеничен малц"], MALTS[5].body, { img: MALT_IMAGES["roasted-barley"] })),
-  ask(pick("malts:coffee", "Откъде идва кафето в стаута?", ["Печен ечемик", "Хмел", "Мая", "Пшеница"], "Печеното до черно зърно.")),
   ask(
-    pictures(
-      "malts:pick-wheat",
-      "Кой е пшеничният малц?",
-      (["wheat", "pilsner", "roasted-barley", "oats"] as const).map((k) => ({ label: MALTS.find((m) => m.key === k)!.name, visual: { img: MALT_IMAGES[k] } })),
-      "Пшеницата е без люспа — зърната са по-заоблени и гладки от ечемичените.",
+    pick(
+      "malts:pick-roast",
+      "Кой от тези е печеният ечемик?",
+      [
+        { label: "Печен ечемик", visual: { img: MALT_IMAGES["roasted-barley"] } },
+        { label: "Пшеничен малц", visual: { img: MALT_IMAGES.wheat } },
+        { label: "Пилзнер малц", visual: { img: MALT_IMAGES.pilsner } },
+        { label: "Овесени люспи", visual: { img: MALT_IMAGES.oats } },
+      ],
+      "Тъмен до черно — оттам идват кафето и цветът на стаута.",
     ),
   ),
+  ask(pick("malts:coffee", "Откъде идва кафето в стаута?", ["Печен ечемик", "Хмел", "Мая", "Пшеница"], "Печеното до черно зърно.")),
   ask(tf("malts:share", "Карамелените малцове обикновено са над половината от рецептата.", false, "Влизат на 5–15% — иначе бирата става сиропена.")),
 ]);
 
-const hops = lesson("hops", "Хмелът", { glass: "tulip", ebc: [10, 16] }, () => [
+const hops = lesson("hops", "Хмелът", "Горчивина, аромат и защо моментът на добавяне решава всичко.", { glass: "tulip", ebc: [10, 16] }, () => [
   card({
     title: "Хмелът е подправката",
     body: "Шишарките на хмела дават горчивина, аромат и пазят бирата от развала. Едно и също растение — три съвсем различни ефекта според това кога влиза.",
@@ -164,7 +170,7 @@ const hops = lesson("hops", "Хмелът", { glass: "tulip", ebc: [10, 16] }, (
   ask(pick("hops:cascade", "Кой аромат е типичен за американския хмел?", ["Цитрус и бор", "Банан и карамфил", "Кафе", "Дим"], "Cascade и сие.")),
 ]);
 
-const yeast = lesson("yeast", "Маята", { glass: "weizen", ebc: [4, 12] }, () => [
+const yeast = lesson("yeast", "Маята", "Ейл или лагер — и откъде идват бананът и пиперът.", { glass: "weizen", ebc: [4, 12] }, () => [
   card({
     title: "Маята прави бирата",
     body: "Пивоварът прави сладка пивна мъст. Бирата я прави маята — изяжда захарта и оставя алкохол, CO₂ и стотици ароматни молекули. Под микроскоп: едноклетъчни гъбички, които се размножават чрез пъпкуване.",
@@ -196,7 +202,7 @@ const yeast = lesson("yeast", "Маята", { glass: "weizen", ebc: [4, 12] }, (
   ask(pick("yeast:sour", "Кой микроорганизъм прави Berliner Weisse кисела?", ["Lactobacillus", "Лагерна мая", "Brettanomyces", "Хмелът"], "Млечнокисели бактерии.")),
 ]);
 
-const tasting = lesson("tasting", "Дегустация", { glass: "tulip", ebc: [20, 30] }, () => [
+const tasting = lesson("tasting", "Дегустация", "Как да гледаш, мирисаш и пиеш като съдия.", { glass: "tulip", ebc: [20, 30] }, () => [
   card({
     title: "Гледай, мирисай, пий",
     body: `Съдиите попълват листа си в този ред: ${SENSORY_ASPECTS.map((a) => a.label.toLowerCase()).join(", ")}. Ароматите избледняват първи, затова се помирисва веднага.`,
@@ -239,7 +245,7 @@ const GLASSES: { shape: GlassShape; name: string; body: string }[] = [
   { shape: "tumbler", name: "Шейкър", body: "Обикновената права чаша. Работи за всичко, но не помага на нищо." },
 ];
 
-const glasses = lesson("glasses", "Чашите", { glass: "weizen", ebc: [6, 10] }, () => [
+const glasses = lesson("glasses", "Чашите", "Осем чаши и защо формата има значение.", { glass: "weizen", ebc: [6, 10] }, () => [
   card({
     title: "Чашата не е само за красота",
     body: "Формата решава колко пяна ще се задържи, колко аромат ще стигне до носа и колко бързо ще се затопли бирата.",
@@ -250,13 +256,17 @@ const glasses = lesson("glasses", "Чашите", { glass: "weizen", ebc: [6, 10
   ...GLASSES.slice(4).map((g) => card({ title: g.name, body: g.body, visual: { glass: g.shape, ebc: [8, 14] } })),
   ask(pick("glasses:tulip", "Как се казва тази чаша?", ["Лале", "Бокал", "Пинта", "Халба"], GLASSES[4].body, { glass: "tulip", ebc: [12, 20] })),
   ask(
-    pictures(
-      "glasses:kolsch",
-      "В коя чаша се сервира Kölsch?",
-      (["stange", "mug", "pint", "footed"] as const).map((shape) => ({ label: GLASSES.find((g) => g.shape === shape)!.name, visual: { glass: shape, ebc: [6, 10] } })),
-      "Щанге — тясна, 0.2 л. И келнерът носи нова, преди да си свършил.",
+    pick(
+      "glasses:pick-weizen",
+      "Коя е чашата за Weissbier?",
+      (["weizen", "pilsner", "stange", "tulip"] as GlassShape[]).map((shape) => ({
+        label: GLASSES.find((g) => g.shape === shape)!.name,
+        visual: { glass: shape, ebc: [6, 12] as const },
+      })),
+      GLASSES[1].body,
     ),
   ),
+  ask(pick("glasses:kolsch", "В каква чаша се сервира Kölsch?", ["Щанге", "Халба", "Пинта", "Бокал"], "Тясна, 0.2 л — и келнерът носи нова.")),
   ask(
     match(
       "glasses:match",
@@ -281,7 +291,7 @@ function order(id: string, prompt: string, correct: string[], hint: [string, str
   return { kind: "order", id, prompt, items, answer: correct.map((c) => items.indexOf(c)), hint, explain };
 }
 
-const water = lesson("water", "Водата", { glass: "pilsner", ebc: [4, 8] }, () => [
+const water = lesson("water", "Водата", "Минералите, които са родили класическите стилове.", { glass: "pilsner", ebc: [4, 8] }, () => [
   card({
     title: "Над 90% от бирата е вода",
     body: "Минералите в нея решават как ще звучат малцът и хмелът. Затова класическите стилове са родени там, където водата им е паснала.",
@@ -313,7 +323,7 @@ const water = lesson("water", "Водата", { glass: "pilsner", ebc: [4, 8] },
   ask(pick("water:carbonate", "Вода, богата на карбонати, пасва най-добре на…", ["Тъмни бири", "Светли лагери", "Кисели бири", "Пшенични бири"], "Киселинността на тъмния малц балансира карбонатите.")),
 ]);
 
-const process = lesson("process", "От зърно до чаша", { glass: "mug", ebc: [16, 30] }, () => [
+const process = lesson("process", "От зърно до чаша", "Пътят от смлян малц до бутилка.", { glass: "mug", ebc: [16, 30] }, () => [
   ...PROCESS_STEPS.map((_, step): Step => ({ card: { kind: "process", step } })),
   ask(order("process:order", "Подреди стъпките във вярната последователност.", ["Затиране", "Варене с хмел", "Охлаждане", "Ферментация"], ["Първо", "Последно"], "Затиране → варене → охлаждане → ферментация.")),
   ask(pick("process:mash", "Какво става при затирането?", ["Нишестето става на захар", "Маята прави алкохол", "Хмелът дава горчивина", "Бирата се газира"], "Ензимите в малца работят при 62–72 °C.")),
@@ -322,7 +332,7 @@ const process = lesson("process", "От зърно до чаша", { glass: "mug
   ask(pick("process:decoction", "Какво е декокция?", ["Част от кашата се вари и връща", "Ферментация на студено", "Сухо охмеляване", "Смесване на две бири"], "Класическа техника за мюнхенския дункел.")),
 ]);
 
-const faults = lesson("faults", "Дефектите", { glass: "tumbler", ebc: [8, 14] }, () => [
+const faults = lesson("faults", "Дефектите", "Шест дефекта и как да ги разпознаеш по аромата.", { glass: "tumbler", ebc: [8, 14] }, () => [
   card({
     title: "Когато нещо не е наред",
     body: "Повечето дефекти имат точен източник и характерен аромат. Да ги разпознаваш значи да знаеш какво се е объркало.",
@@ -371,7 +381,7 @@ const faults = lesson("faults", "Дефектите", { glass: "tumbler", ebc: [
     ),
   ),
   ask(
-    pictures(
+    pick(
       "faults:light",
       "Коя бутилка пази най-добре от светлина?",
       [
@@ -385,7 +395,7 @@ const faults = lesson("faults", "Дефектите", { glass: "tumbler", ebc: [
   ),
 ]);
 
-const food = lesson("food", "Бира и храна", { glass: "tulip", ebc: [40, 70] }, () => [
+const food = lesson("food", "Бира и храна", "Как да съчетаваш бира и храна.", { glass: "tulip", ebc: [40, 70] }, () => [
   card({
     title: "Три правила",
     body: "Съчетай интензитета, допълни сходните вкусове, контрастирай противоположните. Лека бира — лека храна; силна бира — силна храна.",

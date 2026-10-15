@@ -1,7 +1,7 @@
 import { BEER_STYLES, FAMILIES } from "@/lib/beer-guide/styles";
 import { METRICS, formatRange, midpoint } from "@/lib/beer-guide/metrics";
 import { ORIGINS } from "@/lib/beer-guide/origins";
-import type { BeerStyle, Range } from "@/lib/beer-guide/types";
+import type { BeerStyle, GlassShape, Range } from "@/lib/beer-guide/types";
 import type { Answer, Option, Question } from "@/course/types";
 
 export function shuffle<T>(items: readonly T[]): T[] {
@@ -37,15 +37,9 @@ export function trueFalse(id: string, prompt: string, isTrue: boolean, explain: 
 }
 
 /** Hand-written choice: `options[0]` is the right one. */
-export function choiceFirstRight(id: string, prompt: string, options: string[], explain: string, visual?: Question["visual"]): Question {
-  const [right, ...wrong] = options.map((label) => ({ label }));
+export function choiceFirstRight(id: string, prompt: string, options: (string | Option)[], explain: string, visual?: Question["visual"]): Question {
+  const [right, ...wrong] = options.map((o) => (typeof o === "string" ? { label: o } : o));
   return choice({ id, prompt, explain, visual }, right, wrong);
-}
-
-/** Hand-written picture choice: `options[0]` is the right one. */
-export function picturesFirstRight(id: string, prompt: string, options: Option[], explain: string): Question {
-  const [right, ...wrong] = options;
-  return choice({ id, prompt, explain }, right, wrong);
 }
 
 /** Hand-written matching: each pair is [left, right]; both columns get shuffled. */
@@ -94,6 +88,17 @@ export function baseMalt(name: string): string {
   if (/munich/i.test(name)) return "Мюнхенски малц";
   return name;
 }
+export const GLASS_NAMES: Record<GlassShape, string> = {
+  tumbler: "Шейкър",
+  weizen: "Вайцен",
+  pilsner: "Пилзнер",
+  stange: "Щанге",
+  pint: "Пинта",
+  tulip: "Лале",
+  mug: "Халба",
+  footed: "Бокал",
+};
+
 const BASE_MALTS = ["Пилзнер малц", "Пейл ейл малц", "Пшеничен малц", "Виенски малц", "Мюнхенски малц", "Опушен малц (Rauchmalz)"];
 
 /** Every generated question for one style. Lessons pick from it; tests use all. */
@@ -127,6 +132,16 @@ export function styleQuestions(s: BeerStyle): Question[] {
     ),
   );
 
+  // Picture answers: four glasses filled with this style's colour.
+  const glassOption = (shape: GlassShape) => ({ label: GLASS_NAMES[shape], visual: { glass: shape, ebc: s.stats.ebc } });
+  qs.push(
+    choice(
+      { id: id("serve"), prompt: `В коя чаша традиционно се сервира ${s.name}?`, explain: `${s.name} се налива в чаша ${GLASS_NAMES[glass]}.` },
+      glassOption(glass),
+      sample((Object.keys(GLASS_NAMES) as GlassShape[]).filter((g) => g !== glass), 3).map(glassOption),
+    ),
+  );
+
   // The reverse: name given, pick the glass. Options must look different from
   // each other too, or two pictures would be the same drawing.
   const looks: BeerStyle[] = [s];
@@ -134,12 +149,12 @@ export function styleQuestions(s: BeerStyle): Question[] {
     if (looks.length === 4) break;
     if (looks.every((l) => (l.glass ?? "tumbler") !== (o.glass ?? "tumbler") || !overlaps(l.stats.ebc, o.stats.ebc))) looks.push(o);
   }
-  const glassOption = (o: BeerStyle) => ({ label: o.name, visual: { glass: o.glass ?? "tumbler", ebc: o.stats.ebc } });
+  const styleGlass = (o: BeerStyle) => ({ label: o.name, visual: { glass: o.glass ?? "tumbler", ebc: o.stats.ebc } });
   qs.push(
     choice(
       { id: id("pickglass"), prompt: `Коя е ${s.name}?`, explain: `${s.name}: ${formatRange(s.stats.ebc, METRICS.ebc)} EBC.` },
-      glassOption(s),
-      looks.slice(1).map(glassOption),
+      styleGlass(s),
+      looks.slice(1).map(styleGlass),
     ),
   );
 

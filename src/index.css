@@ -1,20 +1,31 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Dark, Uxcel-style. Amber instead of their purple — it's a beer app. */
 @theme {
   --font-sans: "Noto Sans", system-ui, sans-serif;
+  --color-bg: #1d1e25;
+  --color-surface: #272831;
+  --color-raised: #33343f;
+  --color-line: #3d3e4a;
+  --color-ink: #f4f4f6;
+  --color-muted: #a2a3b1;
+  --color-accent: #f2a541;
+  --color-accent-hover: #f6b964;
+  --color-on-accent: #1d1e25;
+  --color-good: #34d399;
+  --color-bad: #fb7185;
+  /* Guide brand green — the backdrop behind glasses and icons. */
   --color-brand: #233329;
-  --color-brand-hover: #2f4436;
-  --color-accent: #cf6911;
-  --color-accent-dark: #b85e0f;
 }
 
 html {
   -webkit-tap-highlight-color: transparent;
+  color-scheme: dark;
 }
 
 body {
-  @apply bg-stone-100 text-stone-900 antialiased;
+  @apply bg-bg text-ink antialiased;
 }
 
 /* The page is a phone-width column even on desktop. */

@@ -24,11 +24,11 @@ export default function OriginMap({ origin, className }: Props) {
     >
       <rect width={map.width} height={map.height} rx={12} fill="#e6eef0" />
       <path d={map.land} fill="#fbfaf8" stroke="#c9c5c0" strokeWidth={0.8} strokeLinejoin="round" />
-      <path d={countries[origin.country]} fill="#cf6911" fillOpacity={0.14} />
+      <path d={countries[origin.country]} fill="#f2a541" fillOpacity={0.22} />
       <path d={map.borders} fill="none" stroke="#d6d3d1" strokeWidth={0.7} strokeLinejoin="round" />
 
-      <circle cx={x} cy={y} r={14} fill="#cf6911" opacity={0.25} className="pin-pulse" style={{ transformOrigin: `${x}px ${y}px` }} />
-      <circle cx={x} cy={y} r={6} fill="#cf6911" stroke="white" strokeWidth={2.5} />
+      <circle cx={x} cy={y} r={14} fill="#f2a541" opacity={0.25} className="pin-pulse" style={{ transformOrigin: `${x}px ${y}px` }} />
+      <circle cx={x} cy={y} r={6} fill="#f2a541" stroke="white" strokeWidth={2.5} />
 
       <text
         x={left ? x - 13 : x + 13}
