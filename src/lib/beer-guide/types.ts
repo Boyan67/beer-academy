@@ -115,8 +115,12 @@ export type BeerStyle = {
   family: StyleFamily;
   /** Traditional glassware; falls back to the plain tumbler when unset. */
   glass?: GlassShape;
-  /** Two sentences, no more — this is a quick-reference guide. */
+  /** Two sentences, no more — used as the lesson description and in a quiz question. */
   summary: string;
+  /** Longer text for the lesson's intro card; falls back to summary. `\n\n` splits paragraphs. */
+  intro?: string;
+  /** What drinking it is like — the lesson's sensory card text. */
+  tasting?: string;
   stats: BeerStyleStats;
   /** Appearance, aroma and flavour as keywords. */
   sensory: SensoryProfile;

@@ -64,6 +64,8 @@ export function Exercise({ card, n }: { card: Card; n: number }) {
   );
 }
 
+const paras = (text: string) => text.split("\n\n").map((p, i) => <p key={i}>{p}</p>);
+
 function section(card: Card): Section {
   if (card.kind === "text") {
     return {
@@ -77,7 +79,7 @@ function section(card: Card): Section {
           <IconArt icon={card.icon} />
         </Figure>
       ) : undefined,
-      body: <p>{card.body}</p>,
+      body: paras(card.body),
     };
   }
 
@@ -95,7 +97,7 @@ function section(card: Card): Section {
           <p className="flex items-center gap-1.5 font-bold tabular-nums text-ink">
             <Thermometer size={18} className="text-accent" /> {step.temp}
           </p>
-          <p>{step.body}</p>
+          {paras(step.body)}
         </>
       ),
     };
@@ -115,7 +117,7 @@ function section(card: Card): Section {
             </div>
           </Figure>
         ),
-        body: <p>{s.summary}</p>,
+        body: paras(s.intro ?? s.summary),
       };
     case "stats":
       return {
@@ -148,7 +150,7 @@ function section(card: Card): Section {
             </div>
           </Figure>
         ),
-        body: <p>Гледаш, мирисаш, пиеш — в този ред съдиите описват {s.name}.</p>,
+        body: s.tasting ? paras(s.tasting) : <p>Съдиите по BJCP първо мирисат {s.name}, защото ароматът изветрява бързо, после гледат цвета и пяната и чак тогава опитват.</p>,
       };
     case "malts":
       return {
@@ -160,7 +162,7 @@ function section(card: Card): Section {
             </div>
           </Figure>
         ),
-        body: <p>{s.malt}</p>,
+        body: paras(s.malt),
       };
     case "hops":
       return {
@@ -172,7 +174,7 @@ function section(card: Card): Section {
             </div>
           </Figure>
         ),
-        body: <p>{s.hops}</p>,
+        body: paras(s.hops),
       };
     case "yeast":
       return {
@@ -187,8 +189,8 @@ function section(card: Card): Section {
         ),
         body: (
           <>
-            <p>{s.yeast}</p>
-            <p>{s.fermentationNote}</p>
+            {paras(s.yeast)}
+            {paras(s.fermentationNote)}
           </>
         ),
       };
@@ -215,7 +217,7 @@ function section(card: Card): Section {
             <OriginMap origin={ORIGINS[s.slug]} className="w-full" />
           </Figure>
         ),
-        body: <p>{s.history}</p>,
+        body: paras(s.history),
       };
     case "fact":
       return {
@@ -223,7 +225,7 @@ function section(card: Card): Section {
         body: (
           <div className="flex gap-3 rounded-2xl border border-accent/40 bg-accent/10 p-4">
             <Lightbulb className="shrink-0 text-accent" />
-            <p>{s.fact}</p>
+            <div className="space-y-3">{paras(s.fact)}</div>
           </div>
         ),
       };

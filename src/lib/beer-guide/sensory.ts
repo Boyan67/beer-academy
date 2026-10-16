@@ -6,7 +6,7 @@ export type SensoryAspect = {
   accent: string;
 };
 
-/** In tasting order, left to right — you look, then smell, then drink. */
+/** Left to right: look, smell, drink. (BJCP judges smell first — aroma fades fast.) */
 export const SENSORY_ASPECTS: SensoryAspect[] = [
   {
     key: "appearance",

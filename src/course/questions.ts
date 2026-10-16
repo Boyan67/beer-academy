@@ -67,6 +67,7 @@ export function checkAnswer(q: Question, a: Answer | undefined): boolean {
   }
 }
 
+const lead = (text: string) => text.split("\n\n")[0].split(/(?<=[.!?])\s+/)[0];
 const overlaps = (a: Range, b: Range) => a[0] <= b[1] && b[0] <= a[1];
 
 /** Same family first — telling a helles from a pils is harder than from a stout. */
@@ -260,7 +261,7 @@ export function styleQuestions(s: BeerStyle): Question[] {
   const ownMalts = new Set(s.malts.map((m) => baseMalt(m.name)));
   qs.push(
     choice(
-      { id: id("malt"), prompt: `Кой малц е основата на ${s.name}?`, explain: s.malt },
+      { id: id("malt"), prompt: `Кой малц е основата на ${s.name}?`, explain: lead(s.malt) },
       { label: baseMalt(main.name) },
       sample(BASE_MALTS.filter((m) => !ownMalts.has(m)), 3).map((label) => ({ label })),
     ),
@@ -272,13 +273,13 @@ export function styleQuestions(s: BeerStyle): Question[] {
       id("dryhop"),
       `${s.name} традиционно се охмелява сухо (dry hop).`,
       dry,
-      dry ? `Да — сухо охмеляване с ${s.hopSchedule.dryHop.join(", ")}.` : `Не. ${s.hops}`,
+      dry ? `Да — сухо охмеляване с ${s.hopSchedule.dryHop.join(", ")}.` : `Не. ${lead(s.hops)}`,
     ),
   );
 
   qs.push(
     choice(
-      { id: id("family"), prompt: `${s.name} е…`, explain: `${s.name} е ${FAMILIES[s.family].short.toLowerCase()}. ${s.yeast}` },
+      { id: id("family"), prompt: `${s.name} е…`, explain: `${s.name} е ${FAMILIES[s.family].short.toLowerCase()}. ${lead(s.yeast)}` },
       { label: FAMILIES[s.family].short },
       [{ label: FAMILIES[s.family === "lager" ? "ale" : "lager"].short }],
     ),
