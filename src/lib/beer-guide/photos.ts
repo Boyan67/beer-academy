@@ -1,8 +1,14 @@
-/** Photos in /public/photos, all from Wikimedia Commons — cropped and resized. */
+/** Photos in /public/photos, from Wikimedia Commons and Pixabay — cropped and resized. */
 export const PHOTOS = {
   hopCones: "/photos/hop-cones.jpg",
   hopPellets: "/photos/hop-pellets.jpg",
+  lupulin: "/photos/lupulin.jpg",
   yeast: "/photos/yeast.jpg",
+  kveik: "/photos/kveik.jpg",
+  pouring: "/photos/pouring.jpg",
+  beerCheese: "/photos/beer-cheese.jpg",
+  dessert: "/photos/dessert.jpg",
+  spicyFood: "/photos/spicy-food.jpg",
   tastingFlight: "/photos/tasting-flight.jpg",
   bottleBrown: "/photos/bottle-brown.jpg",
   bottleOlive: "/photos/bottle-olive.jpg",
@@ -55,5 +61,49 @@ export const PHOTO_CREDITS: PhotoCredit[] = [
     license: "Обществено достояние",
     licenseUrl: "",
     source: "https://commons.wikimedia.org/wiki/File:Beer_bottles_2018_G1.jpg",
+  },
+  {
+    title: "Лупулин в разрязана шишарка",
+    author: "Andrew Kvalheim",
+    license: "CC BY-SA 4.0",
+    licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+    source: "https://commons.wikimedia.org/wiki/File:Lupulin_in_a_cross_section_of_a_hop_cone.jpg",
+  },
+  {
+    title: "Варене с kveik във Вос, Норвегия",
+    author: "Anders Flatlandsmo",
+    license: "CC BY-SA 4.0",
+    licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+    source:
+      "https://commons.wikimedia.org/wiki/File:Brewing_western_Norway_Farmhuse_Ale_wit_kveik_in_a_traditional_smokehouse_at_Dale_farm,_Voss,_Norway.jpg",
+  },
+  // Pixabay doesn't require credit; listed anyway so every photo's source is here.
+  {
+    title: "Наливане на бира",
+    author: "Republica",
+    license: "Pixabay License",
+    licenseUrl: "https://pixabay.com/service/license-summary/",
+    source: "https://pixabay.com/photos/beer-pouring-glass-drink-alcohol-820011/",
+  },
+  {
+    title: "Сирене и колбаси",
+    author: "stevepb",
+    license: "Pixabay License",
+    licenseUrl: "https://pixabay.com/service/license-summary/",
+    source: "https://pixabay.com/photos/smoked-beef-salami-crackers-cheese-2990990/",
+  },
+  {
+    title: "Стаут и десерт",
+    author: "coskun24",
+    license: "Pixabay License",
+    licenseUrl: "https://pixabay.com/service/license-summary/",
+    source: "https://pixabay.com/photos/guinness-beer-sweets-snack-bar-6573283/",
+  },
+  {
+    title: "Тако и бира",
+    author: "covertnine",
+    license: "Pixabay License",
+    licenseUrl: "https://pixabay.com/service/license-summary/",
+    source: "https://pixabay.com/photos/tacos-food-mexican-tray-beer-3409675/",
   },
 ];
