@@ -72,5 +72,7 @@ export type Course = {
   id: string;
   title: string;
   description: string;
+  /** Shown next to the bar chart icon on the course page. */
+  level: string;
   chapters: Chapter[];
 };

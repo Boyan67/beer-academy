@@ -1,8 +1,9 @@
-import { ArrowLeft, Award, Check, ChevronRight, Flame, Lock, Play, Star } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowLeft, Award, ChartNoAxesColumn, Check, ChevronRight, Clock, Flame, ListChecks, Lock, Play, Star, X } from "lucide-react";
 
 import { VisualView } from "@/components/Cards";
-import { COURSES, courseLessons, getCourse } from "@/course/courses";
-import type { Course, Visual } from "@/course/types";
+import { COURSES, courseLessons, getCourse, readMinutes, splitLesson } from "@/course/courses";
+import type { Course, Lesson, Visual } from "@/course/types";
 import { dayKey, levelFor, streak } from "@/progress";
 import { useProgress } from "@/store";
 
@@ -133,38 +134,127 @@ export function Home() {
   );
 }
 
+/** Whole course reading time, from the same per-lesson estimate the lesson intro shows. */
+function courseTime(course: Course) {
+  const min = courseLessons(course).reduce((m, l) => m + readMinutes(splitLesson(l.steps()).cards.length), 0);
+  return min < 60 ? `${min} мин` : `${Math.round(min / 60)} ч`;
+}
+
+/** Bottom sheet previewing the next lesson — reading first, the quiz as the shortcut. */
+function LessonSheet({ lesson, onClose }: { lesson: Lesson; onClose: () => void }) {
+  const ref = useRef<HTMLDialogElement>(null);
+  const parts = useMemo(() => splitLesson(lesson.steps()), [lesson]);
+  useEffect(() => ref.current?.showModal(), []);
+
+  return (
+    <dialog
+      ref={ref}
+      onClose={onClose}
+      // A click on the backdrop lands on the dialog itself.
+      onClick={(e) => e.target === e.currentTarget && ref.current?.close()}
+      aria-labelledby="sheet-title"
+      className="mx-auto mb-0 mt-auto max-h-none w-full max-w-lg overflow-visible rounded-t-3xl bg-surface text-ink duration-300 animate-in slide-in-from-bottom backdrop:bg-black/60"
+    >
+      <span className="absolute -top-16 left-1/2 flex h-32 w-32 -translate-x-1/2 items-center justify-center rounded-full bg-raised">
+        {lesson.visual && <VisualView v={lesson.visual} className="h-20" />}
+      </span>
+      <button type="button" onClick={() => ref.current?.close()} aria-label="Затвори" className="absolute right-3 top-3 rounded-full p-1.5 text-muted hover:text-ink">
+        <X size={22} />
+      </button>
+      <div className="border-b border-line px-6 pb-7 pt-20 text-center">
+        <h2 id="sheet-title" className="text-2xl font-extrabold leading-tight">
+          {lesson.title}
+        </h2>
+        <p className="mt-3 flex justify-center gap-5 text-sm text-muted">
+          <span className="flex items-center gap-1.5">
+            <Clock size={17} /> ~{readMinutes(parts.cards.length)} мин
+          </span>
+          <span className="flex items-center gap-1.5">
+            <ListChecks size={17} /> {parts.questions.length} въпроса
+          </span>
+        </p>
+      </div>
+      <div className="space-y-2 p-4 pb-[max(16px,env(safe-area-inset-bottom))]">
+        <button type="button" onClick={() => go(`#/lesson/${lesson.id}`)} className="w-full rounded-xl bg-accent py-3.5 font-extrabold text-on-accent hover:bg-accent-hover">
+          Прочети теорията
+        </button>
+        <button type="button" onClick={() => go(`#/quiz/${lesson.id}`)} className="w-full py-3 font-bold text-muted hover:text-ink">
+          Направо към теста
+        </button>
+      </div>
+    </dialog>
+  );
+}
+
 export function CourseMap({ id }: { id: string }) {
   const { completed, certificates } = useProgress();
   const course = getCourse(id);
+  const time = useMemo(() => course && courseTime(course), [course]);
+  const [preview, setPreview] = useState(false);
   if (!course) return <NotFound />;
 
-  const states = new Map(lessonStates(course, completed).map((s) => [s.lesson.id, s]));
-  const allDone = [...states.values()].every((s) => s.done);
-  const done = [...states.values()].filter((s) => s.done).length;
+  const list = lessonStates(course, completed);
+  const states = new Map(list.map((s) => [s.lesson.id, s]));
+  const done = list.filter((s) => s.done).length;
+  const allDone = done === list.length;
+  const next = list.find((s) => s.open && !s.done);
+  const pct = Math.round((done / list.length) * 100);
   const cert = certificates[course.id];
 
   return (
     <div>
-      <div className="bg-raised px-4 pb-6 pt-[max(14px,env(safe-area-inset-top))]">
-        <button type="button" onClick={() => go("#/")} aria-label="Назад" className="rounded-full p-1 text-ink/80 hover:text-ink">
+      <div className="relative flex h-60 items-center justify-center bg-raised pt-[env(safe-area-inset-top)]">
+        <button
+          type="button"
+          onClick={() => go("#/")}
+          aria-label="Назад"
+          className="absolute left-3 top-[max(12px,env(safe-area-inset-top))] rounded-full p-1 text-ink/80 hover:text-ink"
+        >
           <ArrowLeft size={26} />
         </button>
-        <div className="mt-2 flex justify-center">
-          <VisualView v={COURSE_ART[course.id]} className="h-28" />
-        </div>
+        <VisualView v={COURSE_ART[course.id]} className="h-32" />
       </div>
-      <div className="space-y-8 p-4 pt-6">
-        <header className="space-y-2">
-          <h1 className="text-3xl font-extrabold">{course.title}</h1>
-          <p className="text-[17px] text-muted">{course.description}</p>
-          <p className="text-sm font-bold text-muted">
-            {done} от {states.size} урока завършени
-          </p>
-        </header>
 
-        {course.chapters.map((ch) => (
+      <header className="space-y-4 border-b border-line p-4 pb-7 pt-6">
+        <nav className="text-sm text-muted">
+          <a href="#/" className="hover:text-ink">
+            Курсове
+          </a>{" "}
+          /
+        </nav>
+        <h1 className="text-3xl font-extrabold leading-tight">{course.title}</h1>
+        <p className="text-[15px] leading-relaxed text-muted">{course.description}</p>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted">
+          <span className="flex items-center gap-2">
+            <span className="h-2 w-24 overflow-hidden rounded-full bg-raised">
+              <span className="block h-full rounded-full bg-accent" style={{ width: `${pct}%` }} />
+            </span>
+            {pct}% завършен
+          </span>
+          <span className="flex items-center gap-1.5">
+            <ChartNoAxesColumn size={18} /> {course.level}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Clock size={17} /> {time}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={() => (next ? setPreview(true) : go(`#/test/${course.id}`))}
+          className="w-full rounded-xl bg-accent py-3.5 font-extrabold text-on-accent hover:bg-accent-hover"
+        >
+          {next ? (done ? "Продължи обучението" : "Започни курса") : cert ? "Пробвай теста пак" : "Към финалния тест"}
+        </button>
+        {preview && next && <LessonSheet lesson={next.lesson} onClose={() => setPreview(false)} />}
+      </header>
+
+      <div className="space-y-8 p-4 pt-6">
+        {course.chapters.map((ch, i) => (
           <section key={ch.title} className="space-y-3">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-muted">{ch.title}</h2>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-muted">Ниво {i + 1}</p>
+              <h3 className="mt-1 text-lg font-bold">{ch.title}</h3>
+            </div>
             {ch.lessons.map((l) => {
               const s = states.get(l.id)!;
               return (
@@ -173,18 +263,15 @@ export function CourseMap({ id }: { id: string }) {
                   type="button"
                   disabled={!s.open}
                   onClick={() => go(`#/lesson/${l.id}`)}
-                  className="flex w-full items-center gap-4 rounded-2xl bg-surface p-3 text-left ring-1 ring-line enabled:hover:ring-muted/60 disabled:opacity-45"
+                  className="flex w-full items-center gap-4 rounded-2xl p-3 text-left ring-1 ring-line enabled:hover:bg-surface disabled:opacity-45"
                 >
-                  <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-brand">
+                  <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-brand ring-1 ring-line">
                     {l.visual && <VisualView v={l.visual} className="h-11" />}
                   </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate font-bold">{l.title}</span>
-                    <span className="block truncate text-sm text-muted">{l.description}</span>
-                  </span>
+                  <span className="min-w-0 flex-1 font-bold leading-snug">{l.title}</span>
                   {s.done ? (
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-good/15 text-good">
-                      <Check size={18} strokeWidth={3} />
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-good text-bg">
+                      <Check size={15} strokeWidth={3.5} />
                     </span>
                   ) : s.open ? (
                     <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent text-on-accent">

@@ -59,6 +59,7 @@ export const COURSES: Course[] = [
     id: "basics",
     title: "Основи",
     description: "Съставките, варенето, дегустацията, дефектите, чашите и храната.",
+    level: "Начинаещ",
     chapters: [
       { title: "Как да четеш бира", lessons: BASICS_LESSONS },
       { title: "От казана до масата", lessons: BREWING_LESSONS },
@@ -68,6 +69,7 @@ export const COURSES: Course[] = [
     id: "lagers",
     title: "Лагери",
     description: "От пилзнер до балтийски портър — студена ферментация, чист профил.",
+    level: "Средно ниво",
     chapters: [
       chapter("Светли", ["german-pils", "czech-premium-pale-lager", "munich-helles"]),
       chapter("Кехлибарени", ["vienna-lager", "marzen", "rauchbier"]),
@@ -78,6 +80,7 @@ export const COURSES: Course[] = [
     id: "ales",
     title: "Ейлове",
     description: "Пшенични, кисели, британски, американски и белгийски.",
+    level: "Средно ниво",
     chapters: [
       chapter("Светли и освежаващи", ["kolsch", "weissbier", "witbier", "berliner-weisse", "gose"]),
       chapter("Британски острови", ["best-bitter", "irish-red-ale", "british-strong-ale", "english-porter", "irish-stout", "imperial-stout"]),
