@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Check, X } from "lucide-react";
 
-import { Figure, VisualView, figureTone } from "@/components/Cards";
+import { VisualFigure, VisualView } from "@/components/Cards";
 import type { Answer, Option, Question } from "@/course/types";
 
 type Props<K extends Question["kind"]> = {
@@ -15,11 +15,7 @@ type Props<K extends Question["kind"]> = {
 export default function QuestionView({ q, ...rest }: Omit<Props<Question["kind"]>, "q"> & { q: Question }) {
   return (
     <div className="space-y-6">
-      {q.visual && (
-        <Figure tone={figureTone(q.visual)}>
-          <VisualView v={q.visual} className="h-40" />
-        </Figure>
-      )}
+      {q.visual && <VisualFigure v={q.visual} />}
       <h2 className="whitespace-pre-line text-xl font-bold">{q.prompt}</h2>
       {q.kind === "choice" && <Choice q={q} {...rest} />}
       {q.kind === "multi" && <Multi q={q} {...rest} />}

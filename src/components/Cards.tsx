@@ -45,7 +45,22 @@ export function Figure({ tone = "brand", children }: { tone?: "brand" | "paper";
   );
 }
 
-const IconArt = ({ icon: Icon }: { icon: LucideIcon }) => <Icon size={72} strokeWidth={1.5} className="text-accent" />;
+/** The big picture above a reading card or prompt. Photos fill the frame; glasses and maps sit in it. */
+export function VisualFigure({ v }: { v: Visual }) {
+  if (v.img && !v.tall)
+    return (
+      <div className="rounded-2xl bg-raised p-2">
+        <img src={v.img} alt="" className="aspect-[4/3] w-full rounded-xl object-cover" />
+      </div>
+    );
+  return (
+    <Figure tone={figureTone(v)}>
+      <VisualView v={v} className="h-40" />
+    </Figure>
+  );
+}
+
+const IconArt =({ icon: Icon }: { icon: LucideIcon }) => <Icon size={72} strokeWidth={1.5} className="text-accent" />;
 
 type Section = { title: string; figure?: React.ReactNode; body?: React.ReactNode };
 
@@ -71,9 +86,7 @@ function section(card: Card): Section {
     return {
       title: card.title,
       figure: card.visual ? (
-        <Figure tone={figureTone(card.visual)}>
-          <VisualView v={card.visual} className="h-40" />
-        </Figure>
+        <VisualFigure v={card.visual} />
       ) : card.icon ? (
         <Figure>
           <IconArt icon={card.icon} />
@@ -128,6 +141,7 @@ function section(card: Card): Section {
           </Figure>
         ),
         body: (
+          <>
           <dl className="grid grid-cols-2 gap-2">
             {METRIC_LIST.map((m) => (
               <div key={m.key} className="rounded-xl bg-surface p-3">
@@ -138,6 +152,8 @@ function section(card: Card): Section {
               </div>
             ))}
           </dl>
+          {s.numbers && paras(s.numbers)}
+          </>
         ),
       };
     case "sensory":

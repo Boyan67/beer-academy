@@ -121,6 +121,8 @@ export type BeerStyle = {
   intro?: string;
   /** What drinking it is like — the lesson's sensory card text. */
   tasting?: string;
+  /** What this style's numbers mean in practice — shown under the stats grid. `\n\n` splits paragraphs. */
+  numbers?: string;
   stats: BeerStyleStats;
   /** Appearance, aroma and flavour as keywords. */
   sensory: SensoryProfile;
