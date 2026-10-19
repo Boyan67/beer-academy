@@ -41,7 +41,7 @@ function styleLesson(slug: string): Lesson {
         ...pickOne("malt", "dryhop"),
         part(slug, "yeast"),
         part(slug, "traits"),
-        ...pickOne("family", "bitter", "color"),
+        ...pickOne("bitter", "color"),
         part(slug, "history"),
         ...pickOne("story:0", "origin"),
         part(slug, "fact"),

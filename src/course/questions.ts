@@ -1,4 +1,4 @@
-import { BEER_STYLES, FAMILIES } from "@/lib/beer-guide/styles";
+import { BEER_STYLES } from "@/lib/beer-guide/styles";
 import { METRICS, formatRange, midpoint } from "@/lib/beer-guide/metrics";
 import { ORIGINS } from "@/lib/beer-guide/origins";
 import type { BeerStyle, GlassShape, Range } from "@/lib/beer-guide/types";
@@ -67,7 +67,10 @@ export function checkAnswer(q: Question, a: Answer | undefined): boolean {
   }
 }
 
-const lead = (text: string) => text.split("\n\n")[0].split(/(?<=[.!?])\s+/)[0];
+const sentences = (text: string) => text.split(/\n\n|(?<=[.!?])\s+/);
+const lead = (text: string) => sentences(text)[0];
+/** Lowercased 5-letter word stems, so „печено“ and „печени“ count as the same word. */
+const stems = (text: string) => text.toLowerCase().split(/[^\p{L}]+/u).filter((w) => w.length > 3).map((w) => w.slice(0, 5));
 const overlaps = (a: Range, b: Range) => a[0] <= b[1] && b[0] <= a[1];
 
 /** Same family first — telling a helles from a pils is harder than from a stout. */
@@ -143,11 +146,13 @@ export function styleQuestions(s: BeerStyle): Question[] {
     ),
   );
 
-  // The reverse: name given, pick the glass. Options must look different from
-  // each other too, or two pictures would be the same drawing.
+  // The reverse: name given, pick the glass. Every wrong picture has a colour
+  // clearly apart from ours — a tulip and a goblet of the same amber read as one
+  // picture on a phone. Options must look different from each other too.
   const looks: BeerStyle[] = [s];
   for (const o of others(s)) {
     if (looks.length === 4) break;
+    if (overlaps(o.stats.ebc, s.stats.ebc)) continue;
     if (looks.every((l) => (l.glass ?? "tumbler") !== (o.glass ?? "tumbler") || !overlaps(l.stats.ebc, o.stats.ebc))) looks.push(o);
   }
   const styleGlass = (o: BeerStyle) => ({ label: o.name, visual: { glass: o.glass ?? "tumbler", ebc: o.stats.ebc } });
@@ -194,11 +199,17 @@ export function styleQuestions(s: BeerStyle): Question[] {
   );
 
   // Wrong aromas must be clearly wrong: taken from beers of a very different
-  // colour, skipping vague hop/malt notes and anything sharing a word with ours.
-  const ownWords = new Set(Object.values(s.sensory).flat().join(" ").toLowerCase().split(/[\s,]+/).filter((w) => w.length > 3));
-  const decoys = [...new Set(others(s, (o) => Math.abs(midpoint(o.stats.ebc) - midpoint(s.stats.ebc)) >= 20).flatMap((o) => o.sensory.aroma))]
-    .filter((a) => !/хмел|малц|чист/i.test(a) && !a.toLowerCase().split(/[\s,]+/).some((w) => ownWords.has(w)))
-    .slice(0, 3);
+  // colour (a porter and an imperial stout share notes, so no overlap at all),
+  // skipping vague hop/malt notes, anything the lesson itself mentions (a stout
+  // aged in bourbon barrels can smell of vanilla), and near-repeats of each other.
+  const ownStems = new Set(stems([s.summary, s.intro, s.tasting, s.malt, s.hops, s.yeast, s.fermentationNote, ...Object.values(s.sensory).flat()].join(" ")));
+  const apart = (o: BeerStyle) => !overlaps(o.stats.ebc, s.stats.ebc) && Math.abs(midpoint(o.stats.ebc) - midpoint(s.stats.ebc)) >= 20;
+  const decoys: string[] = [];
+  for (const a of others(s, apart).flatMap((o) => o.sensory.aroma)) {
+    if (decoys.length === 3) break;
+    if (/хмел|малц|чист/i.test(a) || stems(a).some((w) => ownStems.has(w) || decoys.some((d) => stems(d).includes(w)))) continue;
+    decoys.push(a);
+  }
   const aromaOptions = shuffle([...s.sensory.aroma, ...decoys]);
   qs.push({
     kind: "multi",
@@ -268,22 +279,20 @@ export function styleQuestions(s: BeerStyle): Question[] {
   );
 
   const dry = s.hopSchedule.dryHop.length > 0;
+  // The opening line alone may not mention dry hopping; add the sentence that does.
+  const dryNote = [...new Set([lead(s.hops), sentences(s.hops).find((x) => /сух\S* охмел/i.test(x)) ?? ""])].join(" ").trim();
   qs.push(
     trueFalse(
       id("dryhop"),
       `${s.name} традиционно се охмелява сухо (dry hop).`,
       dry,
-      dry ? `Да — сухо охмеляване с ${s.hopSchedule.dryHop.join(", ")}.` : `Не. ${lead(s.hops)}`,
+      dry ? `Да — сухо охмеляване с ${s.hopSchedule.dryHop.join(", ")}.` : `Не. ${dryNote}`,
     ),
   );
 
-  qs.push(
-    choice(
-      { id: id("family"), prompt: `${s.name} е…`, explain: `${s.name} е ${FAMILIES[s.family].short.toLowerCase()}. ${lead(s.yeast)}` },
-      { label: FAMILIES[s.family].short },
-      [{ label: FAMILIES[s.family === "lager" ? "ale" : "lager"].short }],
-    ),
-  );
+  // No "ale or lager?" question: inside a one-family course it always has the
+  // same answer, and the two real crossovers (Kölsch, Baltic Porter) ask it
+  // better in their handwritten questions.
 
   return qs;
 }
