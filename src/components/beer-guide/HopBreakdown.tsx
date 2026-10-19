@@ -39,7 +39,7 @@ export default function HopBreakdown({ schedule, text }: Props) {
       }
     >
       {showText && (
-        <p className="mb-5 rounded-xl bg-stone-50 p-3.5 text-[14px] leading-relaxed text-stone-600 duration-300 animate-in fade-in slide-in-from-top-1">
+        <p className="mb-5 rounded-xl bg-stone-50 p-3.5 text-sm text-stone-600 duration-300 animate-in fade-in slide-in-from-top-1">
           {text}
         </p>
       )}
@@ -55,7 +55,7 @@ export default function HopBreakdown({ schedule, text }: Props) {
               className={`flex flex-col items-center px-2 py-1`}
             >
               <div
-                className="text-center text-[12px] font-bold uppercase leading-tight tracking-wider"
+                className="text-center text-xs font-bold uppercase tracking-wider"
                 style={{ color: stage.accent }}
               >
                 {stage.label}
@@ -66,7 +66,7 @@ export default function HopBreakdown({ schedule, text }: Props) {
                   {varieties.map((variety) => (
                     <li
                       key={variety}
-                      className="text-center text-[13px] font-semibold leading-snug text-stone-800"
+                      className="text-center text-sm font-semibold text-stone-800"
                     >
                       {variety}
                     </li>
@@ -74,7 +74,7 @@ export default function HopBreakdown({ schedule, text }: Props) {
                 </ul>
               ) : (
                 <div
-                  className="mt-2.5 text-[13px] text-stone-300"
+                  className="mt-2.5 text-sm text-stone-300"
                   aria-label="Няма добавки на този етап"
                 >
                   —

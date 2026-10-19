@@ -37,7 +37,7 @@ function StatsBar() {
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm text-muted">{name ? `Здравей, ${name}` : "Бира Академия"}</p>
-          <p className="text-2xl font-extrabold">{level.name}</p>
+          <p className="text-2xl">{level.name}</p>
         </div>
         <div className="flex gap-2 text-sm font-bold">
           <span className="flex items-center gap-1.5 rounded-full bg-surface px-3 py-1.5" title="Поредни дни">
@@ -84,7 +84,7 @@ export function Home() {
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-bold uppercase tracking-wider text-accent">Продължи</p>
-            <p className="truncate text-lg font-extrabold">{next.lesson.title}</p>
+            <p className="truncate text-xl font-bold">{next.lesson.title}</p>
             <p className="truncate text-sm text-muted">{next.lesson.description}</p>
           </div>
           <span className="mr-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent text-on-accent">
@@ -93,7 +93,7 @@ export function Home() {
         </button>
       )}
 
-      <h2 className="text-xl font-extrabold">Курсове</h2>
+      <h2 className="text-xl font-bold">Курсове</h2>
       {COURSES.map((c) => {
         const states = lessonStates(c, completed);
         const done = states.filter((s) => s.done).length;
@@ -114,10 +114,10 @@ export function Home() {
             </div>
             <div className="p-4">
               <div className="flex items-center gap-2">
-                <h3 className="flex-1 text-xl font-extrabold">{c.title}</h3>
+                <h3 className="flex-1 text-xl font-bold">{c.title}</h3>
                 <ChevronRight className="text-muted" size={20} />
               </div>
-              <p className="mt-1 text-[15px] text-muted">{c.description}</p>
+              <p className="mt-1 text-sm text-muted">{c.description}</p>
               <div className="mt-4 flex items-center gap-3">
                 <div className="h-2 flex-1 overflow-hidden rounded-full bg-raised">
                   <div className="h-full rounded-full bg-accent" style={{ width: `${(done / states.length) * 100}%` }} />
@@ -162,7 +162,7 @@ function LessonSheet({ lesson, onClose }: { lesson: Lesson; onClose: () => void 
         <X size={22} />
       </button>
       <div className="border-b border-line px-6 pb-7 pt-20 text-center">
-        <h2 id="sheet-title" className="text-2xl font-extrabold leading-tight">
+        <h2 id="sheet-title" className="text-2xl">
           {lesson.title}
         </h2>
         <p className="mt-3 flex justify-center gap-5 text-sm text-muted">
@@ -175,7 +175,7 @@ function LessonSheet({ lesson, onClose }: { lesson: Lesson; onClose: () => void 
         </p>
       </div>
       <div className="space-y-2 p-4 pb-[max(16px,env(safe-area-inset-bottom))]">
-        <button type="button" onClick={() => go(`#/lesson/${lesson.id}`)} className="w-full rounded-xl bg-accent py-3.5 font-extrabold text-on-accent hover:bg-accent-hover">
+        <button type="button" onClick={() => go(`#/lesson/${lesson.id}`)} className="w-full rounded-xl bg-accent py-3.5 font-bold text-on-accent hover:bg-accent-hover">
           Прочети теорията
         </button>
         <button type="button" onClick={() => go(`#/quiz/${lesson.id}`)} className="w-full py-3 font-bold text-muted hover:text-ink">
@@ -215,33 +215,35 @@ export function CourseMap({ id }: { id: string }) {
         <VisualView v={COURSE_ART[course.id]} className="h-32" />
       </div>
 
-      <header className="space-y-4 border-b border-line p-4 pb-7 pt-6">
-        <nav className="text-sm text-muted">
-          <a href="#/" className="hover:text-ink">
-            Курсове
-          </a>{" "}
-          /
-        </nav>
-        <h1 className="text-3xl font-extrabold leading-tight">{course.title}</h1>
-        <p className="text-[15px] leading-relaxed text-muted">{course.description}</p>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted">
-          <span className="flex items-center gap-2">
-            <span className="h-2 w-24 overflow-hidden rounded-full bg-raised">
-              <span className="block h-full rounded-full bg-accent" style={{ width: `${pct}%` }} />
+      <header className="border-b border-line p-4 pb-7 pt-6">
+        <div className="space-y-2">
+          <nav className="text-sm text-muted">
+            <a href="#/" className="hover:text-ink">
+              Курсове
+            </a>{" "}
+            /
+          </nav>
+          <h1 className="text-2xl">{course.title}</h1>
+          <p className="text-sm text-muted">{course.description}</p>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted">
+            <span className="flex items-center gap-2">
+              <span className="h-2 w-24 overflow-hidden rounded-full bg-raised">
+                <span className="block h-full rounded-full bg-accent" style={{ width: `${pct}%` }} />
+              </span>
+              {pct}% завършен
             </span>
-            {pct}% завършен
-          </span>
-          <span className="flex items-center gap-1.5">
-            <ChartNoAxesColumn size={18} /> {course.level}
-          </span>
-          <span className="flex items-center gap-1.5">
-            <Clock size={17} /> {time}
-          </span>
+            <span className="flex items-center gap-1.5">
+              <ChartNoAxesColumn size={18} /> {course.level}
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Clock size={17} /> {time}
+            </span>
+          </div>
         </div>
         <button
           type="button"
           onClick={() => (next ? setPreview(true) : go(`#/test/${course.id}`))}
-          className="w-full rounded-xl bg-accent py-3.5 font-extrabold text-on-accent hover:bg-accent-hover"
+          className="mt-6 w-full rounded-xl bg-accent py-3.5 font-bold text-on-accent hover:bg-accent-hover"
         >
           {next ? (done ? "Продължи обучението" : "Започни курса") : cert ? "Пробвай теста пак" : "Към финалния тест"}
         </button>
@@ -253,7 +255,7 @@ export function CourseMap({ id }: { id: string }) {
           <section key={ch.title} className="space-y-3">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-muted">Ниво {i + 1}</p>
-              <h3 className="mt-1 text-lg font-bold">{ch.title}</h3>
+              <h3 className="mt-2 text-xl font-bold">{ch.title}</h3>
             </div>
             {ch.lessons.map((l) => {
               const s = states.get(l.id)!;
@@ -268,7 +270,7 @@ export function CourseMap({ id }: { id: string }) {
                   <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-brand ring-1 ring-line">
                     {l.visual && <VisualView v={l.visual} className="h-11" />}
                   </span>
-                  <span className="min-w-0 flex-1 font-bold leading-snug">{l.title}</span>
+                  <span className="min-w-0 flex-1 font-bold">{l.title}</span>
                   {s.done ? (
                     <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-good text-bg">
                       <Check size={15} strokeWidth={3.5} />
@@ -290,7 +292,7 @@ export function CourseMap({ id }: { id: string }) {
           <div className="flex items-center gap-3">
             <Award size={32} className="text-accent" />
             <div className="flex-1">
-              <h2 className="text-lg font-extrabold">Финален тест</h2>
+              <h2 className="text-xl font-bold">Финален тест</h2>
               <p className="text-sm text-white/70">
                 {cert
                   ? `Взет с ${Math.round(cert.score * 100)}%`
@@ -305,12 +307,12 @@ export function CourseMap({ id }: { id: string }) {
               type="button"
               disabled={!allDone}
               onClick={() => go(`#/test/${course.id}`)}
-              className="flex-1 rounded-xl bg-accent py-3 font-extrabold text-on-accent enabled:hover:bg-accent-hover disabled:opacity-40"
+              className="flex-1 rounded-xl bg-accent py-3 font-bold text-on-accent enabled:hover:bg-accent-hover disabled:opacity-40"
             >
               {cert ? "Пробвай пак" : "Започни теста"}
             </button>
             {cert && (
-              <button type="button" onClick={() => go(`#/cert/${course.id}`)} className="flex-1 rounded-xl bg-white/10 py-3 font-extrabold hover:bg-white/20">
+              <button type="button" onClick={() => go(`#/cert/${course.id}`)} className="flex-1 rounded-xl bg-white/10 py-3 font-bold hover:bg-white/20">
                 Сертификат
               </button>
             )}
@@ -324,7 +326,7 @@ export function CourseMap({ id }: { id: string }) {
 export function NotFound() {
   return (
     <div className="p-8 text-center">
-      <p className="mb-4 text-lg font-bold">Тази страница не съществува.</p>
+      <p className="mb-4 text-xl font-bold">Тази страница не съществува.</p>
       <button type="button" onClick={() => go("#/")} className="rounded-xl bg-accent px-5 py-3 font-bold text-on-accent">
         Към началото
       </button>

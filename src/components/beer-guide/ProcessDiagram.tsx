@@ -130,7 +130,7 @@ export default function ProcessDiagram({ step }: { step: number }) {
               x={cx}
               y={cy + 58}
               textAnchor="middle"
-              className={`text-[13px] ${active ? "fill-stone-900 font-extrabold" : "fill-stone-500 font-semibold"}`}
+              className={`text-[13px] ${active ? "fill-stone-900 font-bold" : "fill-stone-500 font-semibold"}`}
             >
               {PROCESS_STEPS[i].title}
             </text>

@@ -25,7 +25,7 @@ export default function Section({
         >
           <Icon size={17} />
         </span>
-        <h2 className="text-[13px] font-bold uppercase tracking-wider text-stone-800">
+        <h2 className="text-xs font-bold uppercase tracking-wider text-stone-800">
           {title}
         </h2>
         {action && <div className="ml-auto">{action}</div>}

@@ -9,7 +9,7 @@ type Props = {
 export default function StyleFact({ fact }: Props) {
   return (
     <Section icon={Lightbulb} title="Интересен факт" accent="#f59e0b">
-      <p className="text-[15px] leading-relaxed text-stone-700">{fact}</p>
+      <p className="text-sm text-stone-700">{fact}</p>
     </Section>
   );
 }

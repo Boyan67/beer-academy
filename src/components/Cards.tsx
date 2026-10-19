@@ -55,11 +55,11 @@ export function Exercise({ card, n }: { card: Card; n: number }) {
   return (
     <section className="space-y-5">
       <div>
-        <p className="text-sm font-bold uppercase tracking-wider text-muted">Част #{n}</p>
-        <h2 className="mt-1 text-2xl font-extrabold leading-tight">{title}</h2>
+        <p className="text-xs font-bold uppercase tracking-wider text-muted">Част #{n}</p>
+        <h2 className="mt-2 text-xl font-bold">{title}</h2>
       </div>
       {figure}
-      {body && <div className="space-y-4 text-[17px] leading-relaxed text-ink/85">{body}</div>}
+      {body && <div className="space-y-4 text-ink/85">{body}</div>}
     </section>
   );
 }
@@ -131,10 +131,10 @@ function section(card: Card): Section {
           <dl className="grid grid-cols-2 gap-2">
             {METRIC_LIST.map((m) => (
               <div key={m.key} className="rounded-xl bg-surface p-3">
-                <dt className="text-[11px] font-bold uppercase tracking-wider text-muted">
+                <dt className="text-xs font-bold uppercase tracking-wider text-muted">
                   {m.label} · {m.name}
                 </dt>
-                <dd className="mt-0.5 text-lg font-extrabold tabular-nums text-ink">{formatRange(s.stats[m.key], m)}</dd>
+                <dd className="mt-0.5 text-xl font-bold tabular-nums text-ink">{formatRange(s.stats[m.key], m)}</dd>
               </div>
             ))}
           </dl>
@@ -182,7 +182,7 @@ function section(card: Card): Section {
         figure: (
           <Figure>
             <Thermometer size={56} strokeWidth={1.5} className="text-accent" />
-            <p className="mt-3 text-4xl font-extrabold tabular-nums text-white">
+            <p className="mt-3 text-2xl tabular-nums text-white">
               {s.fermentation[0]}–{s.fermentation[1]} °C
             </p>
           </Figure>
@@ -204,7 +204,7 @@ function section(card: Card): Section {
             </span>
             <div>
               <h3 className="font-bold text-ink">{title}</h3>
-              <p className="text-[15px] leading-relaxed text-muted">{text}</p>
+              <p className="text-sm text-muted">{text}</p>
             </div>
           </div>
         )),

@@ -143,8 +143,8 @@ export default function Player({ questions, mode, timeLimit, onExit, onFinish }:
           <div className="mb-4 flex gap-3 duration-200 animate-in slide-in-from-bottom-2" role="status">
             {isRight ? <CircleCheck className="shrink-0 text-good" size={26} /> : <CircleX className="shrink-0 text-bad" size={26} />}
             <div>
-              <p className={`text-lg font-extrabold ${isRight ? "text-good" : "text-bad"}`}>{isRight ? "Точно така!" : "Не съвсем"}</p>
-              <p className="text-[15px] leading-snug text-ink/85">{q.explain}</p>
+              <p className={`text-xl font-bold ${isRight ? "text-good" : "text-bad"}`}>{isRight ? "Точно така!" : "Не съвсем"}</p>
+              <p className="text-ink/85">{q.explain}</p>
             </div>
           </div>
         )}
@@ -152,7 +152,7 @@ export default function Player({ questions, mode, timeLimit, onExit, onFinish }:
           type="button"
           disabled={!revealed && !ready(q, current)}
           onClick={revealed ? () => advance(score) : check}
-          className={`w-full rounded-xl py-4 text-[17px] font-extrabold transition-colors disabled:bg-raised disabled:text-muted ${
+          className={`w-full rounded-xl py-4 font-bold transition-colors disabled:bg-raised disabled:text-muted ${
             revealed && !isRight ? "bg-bad text-bg" : revealed ? "bg-good text-bg" : "bg-accent text-on-accent hover:bg-accent-hover"
           }`}
         >

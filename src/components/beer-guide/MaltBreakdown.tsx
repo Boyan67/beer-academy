@@ -49,7 +49,7 @@ export default function MaltBreakdown({ malts, text }: Props) {
       }
     >
       {showText && (
-        <p className="mb-5 rounded-xl bg-stone-50 p-3.5 text-[14px] leading-relaxed text-stone-600 duration-300 animate-in fade-in slide-in-from-top-1">
+        <p className="mb-5 rounded-xl bg-stone-50 p-3.5 text-sm text-stone-600 duration-300 animate-in fade-in slide-in-from-top-1">
           {text}
         </p>
       )}
@@ -82,10 +82,10 @@ export default function MaltBreakdown({ malts, text }: Props) {
                 </div>
               </div>
 
-              <div className="mt-3 text-lg font-extrabold leading-none tabular-nums text-stone-900">
+              <div className="mt-3 text-base font-bold tabular-nums text-stone-900">
                 {formatShare(malt.share)}
               </div>
-              <div className="mt-1 text-center text-[12px] leading-snug text-stone-700">
+              <div className="mt-1 text-center text-xs text-stone-700">
                 {malt.name}
               </div>
             </div>

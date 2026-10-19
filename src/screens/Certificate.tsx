@@ -20,7 +20,7 @@ export function CertificateScreen({ id }: { id: string }) {
         <button type="button" onClick={() => go(`#/course/${id}`)} aria-label="Назад" className="rounded-full p-1.5 hover:bg-raised">
           <ChevronLeft size={24} />
         </button>
-        <h1 className="text-2xl font-extrabold">Сертификат</h1>
+        <h1 className="text-2xl">Сертификат</h1>
       </header>
 
       {!name && (
@@ -38,17 +38,17 @@ export function CertificateScreen({ id }: { id: string }) {
         <Award className="mx-auto text-accent" size={52} />
         <p className="mt-3 text-xs font-bold uppercase tracking-[0.25em] text-stone-500">Бира Академия · Сертификат</p>
         <p className="mt-6 text-sm text-stone-500">Удостоверява, че</p>
-        <p className="mt-1 text-3xl font-extrabold text-brand">{name || "…"}</p>
+        <p className="mt-1 text-2xl text-brand">{name || "…"}</p>
         <p className="mt-4 text-sm text-stone-500">завърши успешно курса</p>
-        <p className="mt-1 text-2xl font-extrabold">{course.title}</p>
+        <p className="mt-1 text-xl font-bold">{course.title}</p>
         <p className="mx-auto mt-2 max-w-xs text-sm text-stone-600">{course.description}</p>
         <div className="mt-8 flex justify-center gap-10 text-sm">
           <div>
-            <p className="text-xl font-extrabold tabular-nums">{Math.round(cert.score * 100)}%</p>
+            <p className="text-xl font-bold tabular-nums">{Math.round(cert.score * 100)}%</p>
             <p className="text-stone-500">резултат</p>
           </div>
           <div>
-            <p className="text-xl font-extrabold">{date}</p>
+            <p className="text-xl font-bold">{date}</p>
             <p className="text-stone-500">дата</p>
           </div>
         </div>
@@ -58,7 +58,7 @@ export function CertificateScreen({ id }: { id: string }) {
         <button
           type="button"
           onClick={() => print()}
-          className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand py-3.5 font-extrabold text-white hover:bg-brand/80"
+          className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand py-3.5 font-bold text-white hover:bg-brand/80"
         >
           <Printer size={18} /> PDF / Печат
         </button>
@@ -66,7 +66,7 @@ export function CertificateScreen({ id }: { id: string }) {
           <button
             type="button"
             onClick={() => navigator.share({ title: "Бира Академия", text }).catch(() => {})}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-accent py-3.5 font-extrabold text-on-accent hover:bg-accent-hover"
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-accent py-3.5 font-bold text-on-accent hover:bg-accent-hover"
           >
             <Share2 size={18} /> Сподели
           </button>

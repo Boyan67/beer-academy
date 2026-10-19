@@ -20,7 +20,7 @@ export default function QuestionView({ q, ...rest }: Omit<Props<Question["kind"]
           <VisualView v={q.visual} className="h-40" />
         </Figure>
       )}
-      <h2 className="whitespace-pre-line text-xl font-bold leading-snug">{q.prompt}</h2>
+      <h2 className="whitespace-pre-line text-xl font-bold">{q.prompt}</h2>
       {q.kind === "choice" && <Choice q={q} {...rest} />}
       {q.kind === "multi" && <Multi q={q} {...rest} />}
       {q.kind === "order" && <Order q={q} {...rest} />}
@@ -81,7 +81,7 @@ function OptionButton({
       disabled={revealed}
       onClick={onClick}
       aria-pressed={selected}
-      className={`flex w-full items-center gap-3 rounded-2xl border-2 px-5 py-5 text-left text-[17px] transition-colors ${ring(selected, state)}`}
+      className={`flex w-full items-center gap-3 rounded-2xl border-2 px-5 py-5 text-left transition-colors ${ring(selected, state)}`}
     >
       {marker}
       <span className="flex-1">{option.label}</span>
@@ -158,7 +158,7 @@ function Order({ q, answer, onAnswer, revealed }: Props<"order">) {
                 state={revealed ? (item === q.answer[slot] ? "right" : "wrong") : undefined}
                 revealed={revealed || item === undefined}
                 onClick={() => onAnswer(placed.filter((p) => p !== item))}
-                marker={<span className="w-5 text-center font-extrabold text-muted">{slot + 1}</span>}
+                marker={<span className="w-5 text-center font-bold text-muted">{slot + 1}</span>}
               />
             </li>
           );
@@ -222,17 +222,17 @@ function Match({ q, answer, onAnswer, revealed }: Props<"match">) {
                 : "border-dashed border-line";
           return (
             <li key={label} className="grid grid-cols-2 items-stretch gap-2.5">
-              <span className="flex items-center rounded-2xl bg-surface px-4 py-3 font-bold leading-snug">{label}</span>
+              <span className="flex items-center rounded-2xl bg-surface px-4 py-3 font-bold">{label}</span>
               <button
                 type="button"
                 disabled={revealed}
                 onClick={() => tap(slot)}
                 aria-label={`${label}: ${item === -1 ? "празно" : q.right[item]}`}
-                className={`flex items-center gap-1.5 rounded-2xl border-2 px-4 py-3 text-left leading-snug transition-colors ${tone}`}
+                className={`flex items-center gap-1.5 rounded-2xl border-2 px-4 py-3 text-left transition-colors ${tone}`}
               >
                 <span className="flex-1">
                   {item === -1 ? <span className="text-muted">…</span> : q.right[item]}
-                  {revealed && !right && <span className="block text-[13px] font-bold text-good">→ {q.right[q.answer[slot]]}</span>}
+                  {revealed && !right && <span className="block text-sm font-bold text-good">→ {q.right[q.answer[slot]]}</span>}
                 </span>
                 {revealed && <StateIcon state={right ? "right" : "wrong"} className="shrink-0" />}
               </button>
@@ -266,8 +266,8 @@ function Slider({ q, answer, onAnswer, revealed }: Props<"slider">) {
   const pct = (v: number) => ((v - q.min) / (q.max - q.min)) * 100;
   return (
     <div className="space-y-3 rounded-2xl border-2 border-line p-5">
-      <div className="text-center text-4xl font-extrabold tabular-nums">
-        {value} <span className="text-lg text-muted">{q.unit}</span>
+      <div className="text-center text-2xl tabular-nums">
+        {value} <span className="text-base text-muted">{q.unit}</span>
       </div>
       <div className="relative pt-2">
         {revealed && (

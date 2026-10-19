@@ -34,7 +34,7 @@ export default function OriginMap({ origin, className }: Props) {
         x={left ? x - 13 : x + 13}
         y={y + 5}
         textAnchor={left ? "end" : "start"}
-        className="fill-stone-900 text-[15px] font-extrabold"
+        className="fill-stone-900 text-[15px] font-bold"
         stroke="white"
         strokeWidth={4}
         strokeLinejoin="round"

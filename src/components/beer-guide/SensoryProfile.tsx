@@ -19,7 +19,7 @@ export default function SensoryProfile({ sensory }: Props) {
         {SENSORY_ASPECTS.map((aspect) => (
           <div key={aspect.key} className="flex flex-col items-center px-2 py-1">
             <div
-              className="text-center text-[12px] font-bold uppercase leading-tight tracking-wider"
+              className="text-center text-xs font-bold uppercase tracking-wider"
               style={{ color: aspect.accent }}
             >
               {aspect.label}
@@ -29,7 +29,7 @@ export default function SensoryProfile({ sensory }: Props) {
               {sensory[aspect.key].map((note) => (
                 <li
                   key={note}
-                  className="text-center text-[13px] font-semibold leading-snug text-stone-800"
+                  className="text-center text-sm font-semibold text-stone-800"
                 >
                   {note}
                 </li>

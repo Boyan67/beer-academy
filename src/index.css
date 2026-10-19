@@ -3,7 +3,23 @@
 
 /* Dark, Uxcel-style. Amber instead of their purple — it's a beer app. */
 @theme {
-  --font-sans: "Noto Sans", system-ui, sans-serif;
+  --font-sans: "Inter Variable", system-ui, sans-serif;
+
+  /* The whole type scale — nothing else exists, so every size is one of these.
+     Each size carries its line height, so leave leading-* off text. */
+  --text-*: initial;
+  --text-xs: 12px; /* section eyebrows, tags, tiny labels */
+  --text-xs--line-height: 16px;
+  --text-sm: 14px; /* breadcrumbs, title descriptions, small buttons, meta */
+  --text-sm--line-height: 24px;
+  --text-base: 16px; /* body / course text, main buttons */
+  --text-base--line-height: 26px;
+  --text-xl: 20px; /* section and card titles */
+  --text-xl--line-height: 30px;
+  --text-2xl: 24px; /* page titles */
+  --text-2xl--line-height: 32px;
+  --text-2xl--font-weight: 700;
+
   --color-bg: #1d1e25;
   --color-surface: #272831;
   --color-raised: #33343f;
@@ -25,7 +41,7 @@ html {
 }
 
 body {
-  @apply bg-bg text-ink antialiased;
+  @apply bg-bg text-base text-ink antialiased;
 }
 
 /* The page is a phone-width column even on desktop. */

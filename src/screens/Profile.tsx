@@ -41,7 +41,7 @@ export function Profile() {
 
   return (
     <div className="space-y-5 p-4 pt-[max(16px,env(safe-area-inset-top))]">
-      <h1 className="text-2xl font-extrabold">Профил</h1>
+      <h1 className="text-2xl">Профил</h1>
 
       <label className="block rounded-2xl bg-surface p-4">
         <span className="text-sm font-bold text-muted">Име (за сертификатите)</span>
@@ -56,7 +56,7 @@ export function Profile() {
 
       <section className="rounded-2xl bg-surface p-4">
         <div className="flex items-baseline justify-between">
-          <h2 className="text-lg font-extrabold">{level.name}</h2>
+          <h2 className="text-xl font-bold">{level.name}</h2>
           <span className="text-sm font-bold tabular-nums text-muted">{s.xp} XP</span>
         </div>
         <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-raised">
@@ -70,7 +70,7 @@ export function Profile() {
       <section className="rounded-2xl bg-surface p-4">
         <div className="flex items-center gap-2">
           <Flame className="text-accent" fill="currentColor" size={22} />
-          <h2 className="text-lg font-extrabold">
+          <h2 className="text-xl font-bold">
             {days} {days === 1 ? "ден" : "дни"} поред
           </h2>
         </div>
@@ -93,7 +93,7 @@ export function Profile() {
 
       <fieldset className="rounded-2xl bg-surface p-4">
         <legend className="sr-only">Дневна цел</legend>
-        <h2 className="mb-3 text-lg font-extrabold">Дневна цел</h2>
+        <h2 className="mb-3 text-xl font-bold">Дневна цел</h2>
         <div className="grid grid-cols-3 gap-2">
           {GOALS.map((g) => (
             <button
@@ -113,7 +113,7 @@ export function Profile() {
 
       {COURSES.some((c) => s.certificates[c.id]) && (
         <section className="rounded-2xl bg-surface p-4">
-          <h2 className="mb-2 text-lg font-extrabold">Сертификати</h2>
+          <h2 className="mb-2 text-xl font-bold">Сертификати</h2>
           {COURSES.filter((c) => s.certificates[c.id]).map((c) => (
             <button
               key={c.id}
@@ -129,16 +129,16 @@ export function Profile() {
       )}
 
       <section className="space-y-2 rounded-2xl bg-surface p-4">
-        <h2 className="text-lg font-extrabold">Резервно копие</h2>
+        <h2 className="text-xl font-bold">Резервно копие</h2>
         <p className="text-sm text-muted">Прогресът се пази само на това устройство. Свали копие, за да го пренесеш или да не го загубиш.</p>
         <div className="flex gap-2">
-          <button type="button" onClick={download} className="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-line py-2.5 font-bold hover:border-muted">
+          <button type="button" onClick={download} className="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-line py-2.5 text-sm font-bold hover:border-muted">
             <Download size={18} /> Свали
           </button>
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-line py-2.5 font-bold hover:border-muted"
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-line py-2.5 text-sm font-bold hover:border-muted"
           >
             <Upload size={18} /> Възстанови
           </button>

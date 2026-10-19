@@ -24,23 +24,23 @@ import { NotFound, go, lessonStates } from "@/screens/Home";
 const celebrate = () => confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 }, disableForReducedMotion: true });
 
 export const primaryBtn =
-  "w-full rounded-xl bg-accent py-4 text-[17px] font-extrabold text-on-accent transition-colors hover:bg-accent-hover";
+  "w-full rounded-xl bg-accent py-4 font-bold text-on-accent transition-colors hover:bg-accent-hover";
 export const secondaryBtn = "w-full rounded-xl border-2 border-line py-3.5 font-bold text-ink hover:border-muted";
 
 function Done({ title, result, xp, children }: { title: string; result: Result; xp: number; children: React.ReactNode }) {
   const pct = result.total ? Math.round((result.correct / result.total) * 100) : 100;
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center gap-6 p-6 text-center duration-500 animate-in fade-in zoom-in-95">
-      <h1 className="text-3xl font-extrabold">{title}</h1>
+      <h1 className="text-2xl">{title}</h1>
       <div className="grid w-full grid-cols-2 gap-3">
         <div className="rounded-2xl bg-surface p-4">
           <Star className="mx-auto text-accent" fill="currentColor" />
-          <p className="mt-1 text-2xl font-extrabold tabular-nums">+{xp}</p>
+          <p className="mt-1 text-2xl tabular-nums">+{xp}</p>
           <p className="text-sm text-muted">XP</p>
         </div>
         <div className="rounded-2xl bg-surface p-4">
           <Target className="mx-auto text-good" />
-          <p className="mt-1 text-2xl font-extrabold tabular-nums">{pct}%</p>
+          <p className="mt-1 text-2xl tabular-nums">{pct}%</p>
           <p className="text-sm text-muted">
             {result.correct} от {result.total} верни
           </p>
@@ -89,7 +89,7 @@ export function LessonScreen({ id }: { id: string }) {
           <button type="button" onClick={() => go(`#/course/${course.id}`)} aria-label="Назад" className="rounded-full p-1 text-ink/80 hover:text-ink">
             <ArrowLeft size={26} />
           </button>
-          <h1 className={`flex-1 truncate text-center text-lg font-bold transition-opacity ${scrolled ? "opacity-100" : "opacity-0"}`}>{lesson.title}</h1>
+          <h1 className={`flex-1 truncate text-center font-bold transition-opacity ${scrolled ? "opacity-100" : "opacity-0"}`}>{lesson.title}</h1>
           <span className="rounded-lg bg-black/40 px-2.5 py-1 text-sm font-bold tabular-nums">+{xp} XP</span>
         </div>
         {scrolled && (
@@ -103,23 +103,35 @@ export function LessonScreen({ id }: { id: string }) {
         {lesson.visual && <VisualView v={lesson.visual} className="h-44" />}
       </div>
 
-      <div className="space-y-5 px-4 pt-7">
-        <h2 className="text-3xl font-extrabold leading-tight">{lesson.title}</h2>
-        <p className="text-[17px] leading-relaxed text-muted">{lesson.description}</p>
-        <div className="flex gap-5 text-muted">
-          <span className="flex items-center gap-1.5">
-            <Clock size={20} /> ~{readMinutes(parts.cards.length)} мин четене
-          </span>
-          <span className="flex items-center gap-1.5">
-            <ListChecks size={20} /> {parts.questions.length} въпроса
-          </span>
+      <div className="px-4 pt-7">
+        <div className="space-y-2">
+          <nav className="text-sm text-muted">
+            <a href="#/" className="hover:text-ink">
+              Курсове
+            </a>{" "}
+            /{" "}
+            <a href={`#/course/${course.id}`} className="hover:text-ink">
+              {course.title}
+            </a>{" "}
+            /
+          </nav>
+          <h2 className="text-2xl">{lesson.title}</h2>
+          <p className="text-sm text-muted">{lesson.description}</p>
+          <div className="flex gap-5 text-sm text-muted">
+            <span className="flex items-center gap-1.5">
+              <Clock size={17} /> ~{readMinutes(parts.cards.length)} мин четене
+            </span>
+            <span className="flex items-center gap-1.5">
+              <ListChecks size={17} /> {parts.questions.length} въпроса
+            </span>
+          </div>
+          {best !== undefined && (
+            <p className="flex items-center gap-1.5 text-sm font-semibold text-good">
+              <CircleCheck size={17} /> Завършен · най-добър резултат {Math.round(best * 100)}%
+            </p>
+          )}
         </div>
-        {best !== undefined && (
-          <p className="flex items-center gap-1.5 font-semibold text-good">
-            <CircleCheck size={20} /> Завършен · най-добър резултат {Math.round(best * 100)}%
-          </p>
-        )}
-        <button type="button" className={primaryBtn} onClick={toQuiz}>
+        <button type="button" className={`${primaryBtn} mt-6`} onClick={toQuiz}>
           Направо към теста +{xp} XP
         </button>
       </div>
@@ -131,7 +143,7 @@ export function LessonScreen({ id }: { id: string }) {
 
         <section className="rounded-2xl bg-surface p-6 text-center">
           <ListChecks className="mx-auto text-accent" size={40} />
-          <h2 className="mt-3 text-xl font-extrabold">Готов си за теста</h2>
+          <h2 className="mt-3 text-xl font-bold">Готов си за теста</h2>
           <p className="mt-1 text-muted">{parts.questions.length} въпроса върху това, което прочете. Грешните ще се върнат в Преговор.</p>
           <button type="button" className={`${primaryBtn} mt-5`} onClick={toQuiz}>
             Започни теста +{xp} XP
@@ -227,7 +239,7 @@ export function ReviewScreen() {
       <span className="flex h-24 w-24 items-center justify-center rounded-3xl bg-brand text-accent">
         <Brain size={48} strokeWidth={1.5} />
       </span>
-      <h1 className="text-2xl font-extrabold">Преговор</h1>
+      <h1 className="text-2xl">Преговор</h1>
       {due.length ? (
         <>
           <p className="text-muted">
@@ -305,7 +317,7 @@ export function TestScreen({ id }: { id: string }) {
       <span className="flex h-24 w-24 items-center justify-center rounded-3xl bg-brand text-accent">
         <Award size={48} strokeWidth={1.5} />
       </span>
-      <h1 className="text-2xl font-extrabold">Финален тест: {course.title}</h1>
+      <h1 className="text-2xl">Финален тест: {course.title}</h1>
       <ul className="space-y-1.5 text-muted">
         <li>{TEST_SIZE} въпроса от целия курс</li>
         <li className="flex items-center justify-center gap-1">
